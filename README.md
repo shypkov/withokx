@@ -16,10 +16,10 @@ Install dependencies:
 
 ## Start locally without web interface
 *it's recommend to use Visual studio code to run the script, otherwise use OS CLI*
-# 1. Download zip file from "script" folder and extract it to a folder.
-# 2. Setup your settings in config.js
-# 3. Paste your wallets to wallets.txt file, each wallet on a new line
-# 4. Open folder with the bot in cmd
-# 5. cd <path to folder with script>
-# Start with cli
-# 6. node okxWithdraw.js
+1. Download zip file from "script" folder and extract it to a folder.
+2. Setup your settings in config.js
+3. Paste your wallets to wallets.txt file, each wallet on a new line
+4. Open folder with the bot in cmd
+5. cd <path to folder with script>
+Start with cli
+6. node okxWithdraw.js

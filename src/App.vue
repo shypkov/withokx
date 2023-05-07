@@ -27,7 +27,7 @@ export default {
   margin-top: 60px;
 }
 .okx{
-  margin-right: 20%;
-  text-align: right;
+  margin-left: 20%;
+  text-align: left;
 }
 </style>
