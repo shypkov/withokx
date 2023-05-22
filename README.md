@@ -12,4 +12,4 @@ Visual Studio code
 # Get OKX API key, secret Key and passphrase
 1. go to https://www.okx.com/ru/account/my-api and Create API key.
 2. Сheck the box next to the Enable Withdrawals.
-3. Copy API key, secret Key and passphrase to the screen # config.js file.
+3. Add the wallets you want to receive funds to the trusted ones
