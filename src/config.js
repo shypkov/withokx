@@ -10,11 +10,4 @@ module.exports = {
         ccy: 'ETH',
         chain: 'ETH-Arbitrum one'
     },
-//arbUSDC: {
-//        minWithdrawal: 800,
-//        maxWithdrawal: 1200,
-//        fee: 0.01,
-//        ccy: 'USDC',
-//        chain: 'USDC-Arbitrum one'
-//},
 };
