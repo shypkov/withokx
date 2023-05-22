@@ -45,12 +45,12 @@ const withdrawalParams = {
     amt: getRandomNumber(0.0075, 0.02, 6),
     fee: 0.0001,
     dest: 4,
-    ccy: 'ETH',
-    chain: 'ETH-Arbitrum one',
+    ccy: "ETH",
+    chain: "ETH-Arbitrum one",
     toAddr: destinationWallet
   };
   
-const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
+const apiUrl = 'https://www.okx.com/api/v5/asset/withdrawal'
 const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
 const body = JSON.stringify(withdrawalParams)
 // API query const
