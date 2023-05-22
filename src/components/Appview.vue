@@ -2,7 +2,8 @@
 /* eslint-disable */ 
 //import { useQuasar } from 'quasar'
 import { Axios } from 'axios'
-import { CryptoJS } from 'crypto-js'
+import CryptoJS from 'crypto-js'
+// import { enc, HmacSHA256 } from 'crypto-js'
 import { ref } from 'vue'
 
 // configuration section
@@ -22,12 +23,11 @@ const generateOKXSign = (timestamp, method, body) => {
   return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
 };
 
-
 const axios = new Axios({
   headers: {
     'Content-Type': 'application/json',
-    'OK-ACCESS-KEY': apiKey.value,
-    'OK-ACCESS-PASSPHRASE': passphrase.value
+    "OK-ACCESS-KEY": apiKey.value,
+    "OK-ACCESS-PASSPHRASE": passphrase.value
   }
 });
 
@@ -37,7 +37,6 @@ function getRandomNumber(min, max, fixed) {
   const power = Math.pow(10, fixed);
   return (Math.floor(rand * power) / power).toFixed(fixed);
 };
-
 
 async function sendTokens({ destinationWallet }) {
 //const ON_CHAIN = 4;
