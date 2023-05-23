@@ -6,30 +6,21 @@ import CryptoJS from 'crypto-js'
 // import { enc, HmacSHA256 } from 'crypto-js'
 import { ref } from 'vue'
 
-// configuration section
-const apiKey = ref()
-const passphrase = ref()
-const secretKey = ref()
-const minWithdrawal = ref()
-const maxWithdrawal = ref()
-//const fee = ref()
-const adress1 = ref()
-const adress2 = ref()
-const adress3 = ref()
+const apiKey = ref();
+const passphrase = ref();
+const secretKey = ref();
+const fee = ref();
+const adress1 = ref();
+const adress2 = ref();
+//const adress3 = ref()
+const minWithdrawal = ref();
+const maxWithdrawal = ref();
 
 //create encrypted hash for OKXsign
 const generateOKXSign = (timestamp, method, body) => {
-  const withdrawalEndpoint = "/api/v5/asset/withdrawal";
+  const withdrawalEndpoint = '/api/v5/asset/withdrawal';
   return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
 };
-
-const axios = new Axios({
-  headers: {
-    'Content-Type': 'application/json',
-    "OK-ACCESS-KEY": apiKey.value,
-    "OK-ACCESS-PASSPHRASE": passphrase.value
-  }
-});
 
 //random number for withdrawal amount
 function getRandomNumber(min, max, fixed) {
@@ -40,17 +31,26 @@ function getRandomNumber(min, max, fixed) {
 
 async function sendTokens({ destinationWallet }) {
 //const ON_CHAIN = 4;
-
+var ammount = getRandomNumber(Number(minWithdrawal.value), Number(maxWithdrawal.value), 4);
+//console.log(`ammount from random`, ammount);
 const withdrawalParams = {
-    amt: getRandomNumber(0.0075, 0.02, 6),
-    fee: 0.0001,
+    amt: ammount,
+    fee: fee.value,
     dest: 4,
-    ccy: "ETH",
-    chain: "ETH-Arbitrum one",
+    ccy: 'ETH',
+    chain: 'ETH-Arbitrum one',
     toAddr: destinationWallet
   };
-  
-const apiUrl = 'https://www.okx.com/api/v5/asset/withdrawal'
+
+const axios = new Axios({
+  headers: {
+    'Content-Type': 'application/json',
+    'OK-ACCESS-KEY': apiKey.value,
+    'OK-ACCESS-PASSPHRASE': passphrase.value
+  }
+});
+
+const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
 const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
 const body = JSON.stringify(withdrawalParams)
 // API query const
@@ -60,6 +60,8 @@ const response = await axios.post(apiUrl, body, {
       "OK-ACCESS-SIGN": generateOKXSign(TIMESTAMP, 'POST', body),
     }
   })
+//console.log(`withdrawal.fee`, withdrawalParams.fee);
+//console.log(`withdrawal.amt`, withdrawalParams.amt);
 
 //error proccessing
 const parsedResponse = JSON.parse(response.data);
@@ -72,19 +74,17 @@ const responseError = parsedResponse.msg;
  console.log(`Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain}`);
  const wdId = parsedResponse.data[0].wdId;
  console.log(`OKX transaction ID: ${wdId}`);
-
 //  const delay = getRandomNumber(35, 150, 50) * 1000;
 //  console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 //  await new Promise(resolve => setTimeout(resolve, delay));
   console.log("")
 }
 
-async function withdrawToAllAddresses() {
+async function withdrawToArbAddresses() {
   try {
-    const walletsarb = [adress1.value]
+    const walletsarb = [adress1.value,adress2.value]
     for (const destinationWallet of walletsarb) {
       await sendTokens({ destinationWallet });
-//      console.log(`apikey: ${apiKey.value}`);
     }
   }
   catch (error)
@@ -93,20 +93,20 @@ async function withdrawToAllAddresses() {
   }
 };
 
-
 export default {
   setup () {
 //  const $q = useQuasar()
   return {
       adress1,
       adress2,
-      adress3,
+//      adress3,
       apiKey,
       secretKey,
       passphrase,
       minWithdrawal,
       maxWithdrawal,
-      withdrawToAllAddresses
+      fee,
+      withdrawToArbAddresses
     } 
 }
 }
@@ -117,10 +117,10 @@ export default {
     <div class="q-gutter-md" style="max-width: 500px">
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
+<!--   <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> -->
     <li>
   <div class="q-pa-md q-gutter-sm">
-  <q-btn color="primary" label="Transfer" @click="withdrawToAllAddresses()" />
+  <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" />
   </div>
 <!--  <div class="q-pa-md q-gutter-sm">
       <q-badge color="green" rounded class="q-mr-sm" /> 
@@ -128,18 +128,18 @@ export default {
   </div>-->
  <h3>   Configuration params</h3>
     <p>
-      API URL OKX <a href="https://www.okx.com/api/v5/asset/withdrawal" target="apiUrl" rel="noopener">https://www.okx.com/api/v5/asset/withdrawal</a>
-    <ul> ONLY arbETH can be withdrawed </ul>
+      API URL OKX <a href="https://www.okx.cab/api/v5/asset/withdrawal" target="apiUrl" rel="noopener">https://www.okx.com/api/v5/asset/withdrawal</a>
+    <ul> ONLY arbETH can be withdrawed for now</ul>
     </p>
 </li>
 </div>
 <div class="q-gutter-md" style="max-width: 300px">
-<q-input outlined v-model="apiKey" label="Apikey" />
-<q-input outlined v-model="secretKey" label="Secretkey" />
+<q-input outlined v-model="apiKey" label="apiKey" />
+<q-input outlined v-model="secretKey" label="secretKey" />
 <q-input outlined v-model="passphrase" label="Passphrase" />
 <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal" />
 <q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal" />
-<!--<q-input outlined v-model="fee" placeholder="0.0001" label="fee" />-->
+<q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
 </div>
   </div>
 </template>
@@ -147,8 +147,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
-  font-size: 32px;
-  margin: 20px 0 0;
+  font-size: 22px;
+  margin: 10px 0 0;
 }
 ul {
   list-style-type: none;
