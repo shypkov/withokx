@@ -17,6 +17,7 @@ const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
 const maxtimedelay = ref();
+const networks = ref();
 
 //create encrypted hash for OKXsign
 const generateOKXSign = (timestamp, method, body) => {
@@ -34,13 +35,13 @@ function getRandomNumber(min, max, fixed) {
 async function sendTokens({ destinationWallet }) {
 //const ON_CHAIN = 4;
 var ammount = getRandomNumber(Number(minWithdrawal.value), Number(maxWithdrawal.value), 4);
-//console.log(`ammount from random`, ammount);
+
 const withdrawalParams = {
     amt: ammount,
     fee: fee.value,
     dest: 4,
     ccy: 'ETH',
-    chain: 'ETH-Arbitrum one',
+    chain: networks.value,
     toAddr: destinationWallet
   };
 
@@ -64,7 +65,7 @@ const response = await axios.post(apiUrl, body, {
   })
 //console.log(`withdrawal.fee`, withdrawalParams.fee);
 //console.log(`withdrawal.amt`, withdrawalParams.amt);
-
+//console.log(`network`, networks.value);
 //error proccessing
 const parsedResponse = JSON.parse(response.data);
 const responseError = parsedResponse.msg;
@@ -85,8 +86,8 @@ await new Promise(resolve => setTimeout(resolve, delay));
 
 async function withdrawToArbAddresses() {
   try {
-    const walletsarb = [adress1.value,adress2.value,adress3.value]
-    for (const destinationWallet of walletsarb) {
+    const wallets = [adress1.value,adress2.value,adress3.value]
+    for (const destinationWallet of wallets) {
       await sendTokens({ destinationWallet });
     }
   }
@@ -112,6 +113,7 @@ export default {
       mintimedelay,
       maxtimedelay,
       usedelay: ref(false),
+      networks: ref('ETH-Arbitrum one'),
       withdrawToArbAddresses
     } 
 }
@@ -119,42 +121,68 @@ export default {
 </script>
 
 <template>
-  <div class="q-pa-md">
-    <div class="q-gutter-lg">
-      <q-toggle v-model="usedelay" color="blue" label="Use Time Delay between transfers"/>
-    </div>
-      <div class="q-gutter-md" style="max-width: 250px; padding: 10px;" v-if="usedelay === true">
-      <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
-      <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
-      </div>
-  <div class="q-gutter-md" style="max-width: 450px">
+<div class="container">
+  <div class="row"> 
+  <div class="col-sm" style="width: 450px;">
+    <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
+    <ul>Fill the adress carefully and successively. This form is not validating inputs and stops on empty adress value in field</ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
     <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
-    <li>
-  <div class="q-pa-md q-gutter-sm">
-  <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" />
+    </div>
   </div>
-<div style="font-size: 8px">
-API URL OKX <a href="https://www.okx.cab/api/v5/asset/withdrawal" target="apiUrl" rel="noopener">https://www.okx.cab/api/v5/asset/withdrawal</a>
+  <div class="col-sm" style="width: 450px;">
+    <li>
+    <ul>You can set a range of values between min and max to randomize withdraw value</ul>
+  </li>
+    <div class="q-gutter-md" style="max-width: 280px; margin-left: 95px;">
+      <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal value" />
+      <q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal value" />
+      <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
+    </div>
+    <ul>Press Transfer Button to complete transfer</ul>
+      <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" />  
+    <div class="col-sm" >
+  <div class="q-gutter-md q-pa-md" style="width: 450px; font-size: 11px;">
+    <ul> You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</ul>
+      <q-toggle v-model="usedelay" color="blue" label="Use Time Delay between transfers"/>
+    </div>
+      <div class="row" style="width: 250px; margin-left: 135px;" v-if="usedelay === true">
+        <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
+        <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
+      </div>
+    </div>
+  </div>  
+  <div class="col-sm" style="align-items: center;">
+    <div class="q-gutter-md q-pa-md" style="width: 350px; margin-left: 15px; font-size: 12px;">
+      <li></li>
+    <ul>fullfill Configuration Params from API OKX</ul>
+      <q-input outlined v-model="apiKey" label="apiKey" />
+      <q-input outlined v-model="secretKey" label="secretKey" />
+      <q-input outlined v-model="passphrase" label="Passphrase" />
+    </div>
+  </div>
 </div>
-<ul> ONLY arbETH can be withdrawed for now.</ul>
+<ul>Select arbETH or Ethereum network to withdraw eth asset</ul>
+<div class="q-gutter-md">
+    <q-btn-toggle
+      v-model="networks"
+      push
+      glossy
+      toggle-color="blue"
+      :options="[
+        {label: 'Arbitrum', value: 'ETH-Arbitrum one'},
+        {label: 'Ethereum', value: 'ETH-ERC20'}
+        ]"/>
+</div>
+
+
 <!--  <div class="q-pa-md q-gutter-sm">
       <q-badge color="green" rounded class="q-mr-sm" /> 
       {{ result }}
   </div>-->
-<p>Configuration params</p>
-</li>
 </div>
-<div class="q-gutter-md" style="max-width: 300px">
-<q-input outlined v-model="apiKey" label="apiKey" />
-<q-input outlined v-model="secretKey" label="secretKey" />
-<q-input outlined v-model="passphrase" label="Passphrase" />
-<q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal" />
-<q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal" />
-<q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
-</div>
-  </div>
+
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -163,6 +191,7 @@ h3 {
   font-size: 22px;
   margin: 10px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 30;
@@ -174,4 +203,5 @@ li {
 a {
   color: #42b983;
 }
+ 
 </style>

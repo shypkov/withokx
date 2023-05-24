@@ -1,8 +1,12 @@
 <template>
 <div class="okx">
 <img alt="okx logo" width="80" height="80" src="./assets/okx.png">
+
+<div style="font-size: 10px">
+<b>This is the multi-transfer from OKX to wallets web application</b>
 </div>
   <Appview/>
+</div>  
 </template>
 
 
@@ -25,10 +29,10 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 30px;
 }
 .okx{
-  margin-left: 20%;
-  text-align: left;
+  margin-left: 0%;
+  text-align: center;
 }
 </style>
