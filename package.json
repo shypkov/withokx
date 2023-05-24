@@ -19,7 +19,8 @@
     "crypto-js": "^4.1.1",
     "pinia": "^2.0.35",
     "quasar": "^2.11.10",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-gtag": "^2.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~5.0.0",

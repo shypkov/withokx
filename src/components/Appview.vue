@@ -12,9 +12,11 @@ const secretKey = ref();
 const fee = ref();
 const adress1 = ref();
 const adress2 = ref();
-//const adress3 = ref()
+const adress3 = ref()
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
+const mintimedelay = ref();
+const maxtimedelay = ref();
 
 //create encrypted hash for OKXsign
 const generateOKXSign = (timestamp, method, body) => {
@@ -69,20 +71,21 @@ const responseError = parsedResponse.msg;
   if (responseError && responseError.length > 0) {
     throw new Error(`Error : ${responseError}`);
   }
-// logresults
- console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!`);
- console.log(`Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain}`);
- const wdId = parsedResponse.data[0].wdId;
- console.log(`OKX transaction ID: ${wdId}`);
-//  const delay = getRandomNumber(35, 150, 50) * 1000;
-//  console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
-//  await new Promise(resolve => setTimeout(resolve, delay));
+
+const success = console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!`);
+console.log(`Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain}`);
+const wdId = parsedResponse.data[0].wdId;
+console.log(`OKX transaction ID: ${wdId}`);
+
+const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
+console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
+await new Promise(resolve => setTimeout(resolve, delay));
   console.log("")
 }
 
 async function withdrawToArbAddresses() {
   try {
-    const walletsarb = [adress1.value,adress2.value]
+    const walletsarb = [adress1.value,adress2.value,adress3.value]
     for (const destinationWallet of walletsarb) {
       await sendTokens({ destinationWallet });
     }
@@ -99,13 +102,16 @@ export default {
   return {
       adress1,
       adress2,
-//      adress3,
+      adress3,
       apiKey,
       secretKey,
       passphrase,
       minWithdrawal,
       maxWithdrawal,
       fee,
+      mintimedelay,
+      maxtimedelay,
+      usedelay: ref(false),
       withdrawToArbAddresses
     } 
 }
@@ -114,23 +120,30 @@ export default {
 
 <template>
   <div class="q-pa-md">
-    <div class="q-gutter-md" style="max-width: 500px">
+    <div class="q-gutter-lg">
+      <q-toggle v-model="usedelay" color="blue" label="Use Time Delay between transfers"/>
+    </div>
+      <div class="q-gutter-md" style="max-width: 250px; padding: 10px;" v-if="usedelay === true">
+      <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
+      <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
+      </div>
+  <div class="q-gutter-md" style="max-width: 450px">
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
-<!--   <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> -->
+    <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
     <li>
   <div class="q-pa-md q-gutter-sm">
   <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" />
   </div>
+<div style="font-size: 8px">
+API URL OKX <a href="https://www.okx.cab/api/v5/asset/withdrawal" target="apiUrl" rel="noopener">https://www.okx.cab/api/v5/asset/withdrawal</a>
+</div>
+<ul> ONLY arbETH can be withdrawed for now.</ul>
 <!--  <div class="q-pa-md q-gutter-sm">
       <q-badge color="green" rounded class="q-mr-sm" /> 
       {{ result }}
   </div>-->
- <h3>   Configuration params</h3>
-    <p>
-      API URL OKX <a href="https://www.okx.cab/api/v5/asset/withdrawal" target="apiUrl" rel="noopener">https://www.okx.com/api/v5/asset/withdrawal</a>
-    <ul> ONLY arbETH can be withdrawed for now</ul>
-    </p>
+<p>Configuration params</p>
 </li>
 </div>
 <div class="q-gutter-md" style="max-width: 300px">
