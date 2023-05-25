@@ -17,7 +17,10 @@ const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
 const maxtimedelay = ref();
-const networks = ref();
+const networks = ref('ETH-Arbitrum one');
+const ccy = ref('ETH');
+const resulttext = ref([]);
+const usedelay = ref(false);
 
 //create encrypted hash for OKXsign
 const generateOKXSign = (timestamp, method, body) => {
@@ -40,7 +43,7 @@ const withdrawalParams = {
     amt: ammount,
     fee: fee.value,
     dest: 4,
-    ccy: 'ETH',
+    ccy: ccy.value,
     chain: networks.value,
     toAddr: destinationWallet
   };
@@ -66,34 +69,35 @@ const response = await axios.post(apiUrl, body, {
 //console.log(`withdrawal.fee`, withdrawalParams.fee);
 //console.log(`withdrawal.amt`, withdrawalParams.amt);
 //console.log(`network`, networks.value);
-//error proccessing
+//console.log(`ccy`, ccy.value);
 const parsedResponse = JSON.parse(response.data);
 const responseError = parsedResponse.msg;
   if (responseError && responseError.length > 0) {
     throw new Error(`Error : ${responseError}`);
   }
 
-const success = console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!`);
-console.log(`Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain}`);
 const wdId = parsedResponse.data[0].wdId;
-console.log(`OKX transaction ID: ${wdId}`);
+console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
 
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 await new Promise(resolve => setTimeout(resolve, delay));
-  console.log("")
+console.log("")
 }
 
 async function withdrawToArbAddresses() {
+resulttext.value = [];
   try {
     const wallets = [adress1.value,adress2.value,adress3.value]
     for (const destinationWallet of wallets) {
       await sendTokens({ destinationWallet });
     }
+resulttext.value = ('Withdrawal successful!', wdId.value);
   }
   catch (error)
   {
-    console.log('\x1b[31m%s\x1b[0m', `Withdrawal failed:`, error.message);
+console.log('\x1b[31m%s\x1b[0m', `Withdrawal failed:`, error.message);
+resulttext.value = ('Unsuccessful! error appeared', error.message);
   }
 };
 
@@ -112,8 +116,10 @@ export default {
       fee,
       mintimedelay,
       maxtimedelay,
-      usedelay: ref(false),
-      networks: ref('ETH-Arbitrum one'),
+      usedelay,
+      networks,
+      ccy,
+      resulttext,
       withdrawToArbAddresses
     } 
 }
@@ -141,8 +147,9 @@ export default {
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" />  
+      <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
     <div class="col-sm" >
+<!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
   <div class="q-gutter-md q-pa-md" style="width: 450px; font-size: 11px;">
     <ul> You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</ul>
       <q-toggle v-model="usedelay" color="blue" label="Use Time Delay between transfers"/>
@@ -161,6 +168,14 @@ export default {
       <q-input outlined v-model="secretKey" label="secretKey" />
       <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
+    <div style="width: 300px; margin-left: 50px; font-size: 11px; max-height: 500px;">
+    <ul><b>Here is an operation output</b></ul>
+    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 500px;">
+      <q-card-section v-for="item in resulttext" :key="item">
+        {{ resulttext }}
+      </q-card-section>
+    </q-card>
+  </div>
   </div>
 </div>
 <ul>Select arbETH or Ethereum network to withdraw eth asset</ul>
@@ -172,15 +187,27 @@ export default {
       toggle-color="blue"
       :options="[
         {label: 'Arbitrum', value: 'ETH-Arbitrum one'},
-        {label: 'Ethereum', value: 'ETH-ERC20'}
+        {label: 'Ethereum', value: 'ETH-ERC20'},
+        {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
+        ]"/>
+</div>
+<ul><b>Select asset to withdraw</b></ul>
+<div class="q-gutter-md">
+    <q-btn-toggle
+      v-model="ccy"
+      push
+      glossy
+      toggle-color="green"
+      :options="[
+        {label: 'ETH', value: 'ETH'},
+        {label: 'USDT', value: 'USDT'},
+        {label: 'USDC', value: 'USDC'}
         ]"/>
 </div>
 
-
 <!--  <div class="q-pa-md q-gutter-sm">
-      <q-badge color="green" rounded class="q-mr-sm" /> 
       {{ result }}
-  </div>-->
+</div>-->
 </div>
 
 </template>
