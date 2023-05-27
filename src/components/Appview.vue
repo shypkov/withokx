@@ -20,9 +20,11 @@ const maxtimedelay = ref();
 const networks = ref('ETH-Arbitrum one');
 const ccy = ref('ETH');
 const resulttext = ref([]);
+let result = ref();
 const usedelay = ref(false);
 
 //create encrypted hash for OKXsign
+
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
   return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
@@ -78,27 +80,32 @@ const responseError = parsedResponse.msg;
 
 const wdId = parsedResponse.data[0].wdId;
 console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-
+result = ('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
+resulttext.value = [...resulttext.value, result];
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
+result = ('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 await new Promise(resolve => setTimeout(resolve, delay));
 console.log("")
+resulttext.value = [...resulttext.value, result];
 }
 
 async function withdrawToArbAddresses() {
-resulttext.value = [];
+let result = '';
+console.log(`what next?`, result);
   try {
     const wallets = [adress1.value,adress2.value,adress3.value]
     for (const destinationWallet of wallets) {
       await sendTokens({ destinationWallet });
     }
-resulttext.value = ('Withdrawal successful!', wdId.value);
   }
   catch (error)
   {
 console.log('\x1b[31m%s\x1b[0m', `Withdrawal failed:`, error.message);
-resulttext.value = ('Unsuccessful! error appeared', error.message);
+result = ('No more adresses can be proceeded', error.message);
+resulttext.value = [...resulttext.value, result];
   }
+console.log(`what end?`, result);
 };
 
 export default {
@@ -120,6 +127,7 @@ export default {
       networks,
       ccy,
       resulttext,
+      result,
       withdrawToArbAddresses
     } 
 }
