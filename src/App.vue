@@ -1,12 +1,12 @@
 <template>
-<div class="okx">
+<div style="font-size: 10px; text-align: center;">
 <img alt="okx logo" width="80" height="80" src="./assets/okx.png">
 
-<div style="font-size: 10px">
-<b>This is the multi-transfer from OKX to wallets web application</b>
+<span>
+<ul><b>This is the multi-transfer from OKX exchange to wallets helper</b></ul>
+</span>
 </div>
   <Appview/>
-</div>  
 </template>
 
 
@@ -32,7 +32,7 @@ export default {
   margin-top: 30px;
 }
 .okx{
-  margin-left: 0%;
+  margin-left: 30px;
   text-align: center;
 }
 </style>

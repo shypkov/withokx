@@ -21,6 +21,8 @@ const networks = ref('ETH-Arbitrum one');
 const ccy = ref('ETH');
 const resulttext = ref([]);
 let result = ref();
+let howto = ref(false);
+const complete = ref(false);
 const usedelay = ref(false);
 
 //create encrypted hash for OKXsign
@@ -68,10 +70,6 @@ const response = await axios.post(apiUrl, body, {
       "OK-ACCESS-SIGN": generateOKXSign(TIMESTAMP, 'POST', body),
     }
   })
-//console.log(`withdrawal.fee`, withdrawalParams.fee);
-//console.log(`withdrawal.amt`, withdrawalParams.amt);
-//console.log(`network`, networks.value);
-//console.log(`ccy`, ccy.value);
 const parsedResponse = JSON.parse(response.data);
 const responseError = parsedResponse.msg;
   if (responseError && responseError.length > 0) {
@@ -85,14 +83,14 @@ resulttext.value = [...resulttext.value, result];
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 result = ('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
+resulttext.value = [...resulttext.value, result];
 await new Promise(resolve => setTimeout(resolve, delay));
 console.log("")
-resulttext.value = [...resulttext.value, result];
 }
 
 async function withdrawToArbAddresses() {
 let result = '';
-console.log(`what next?`, result);
+complete.value=true;
   try {
     const wallets = [adress1.value,adress2.value,adress3.value]
     for (const destinationWallet of wallets) {
@@ -105,7 +103,7 @@ console.log('\x1b[31m%s\x1b[0m', `Withdrawal failed:`, error.message);
 result = ('No more adresses can be proceeded', error.message);
 resulttext.value = [...resulttext.value, result];
   }
-console.log(`what end?`, result);
+complete.value=false;
 };
 
 export default {
@@ -128,6 +126,8 @@ export default {
       ccy,
       resulttext,
       result,
+      howto,
+      complete,
       withdrawToArbAddresses
     } 
 }
@@ -137,7 +137,7 @@ export default {
 <template>
 <div class="container">
   <div class="row"> 
-  <div class="col-sm" style="width: 450px;">
+  <div class="col-sm" style="max-width: 450px; margin-left: auto;">
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
     <ul>Fill the adress carefully and successively. This form is not validating inputs and stops on empty adress value in field</ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
@@ -145,40 +145,67 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
     </div>
   </div>
-  <div class="col-sm" style="width: 450px;">
+  <div class="col-sm" style="max-width: 350px; margin-left: 0px; align-items: left; ">
     <li>
     <ul>You can set a range of values between min and max to randomize withdraw value</ul>
   </li>
-    <div class="q-gutter-md" style="max-width: 280px; margin-left: 95px;">
+    <div class="q-gutter-md" style="width: 250px; margin-left: 60px;">
       <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal value" />
       <q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal value" />
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
+      <q-btn v-model="complete" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
+      <div v-if="complete === true">
+        <q-spinner-box color="primary" size="2em" /> 
+        <q-tooltip :offset="[0, 8]">Running</q-tooltip>
+      </div>
+      <div class="q-pa-md q-gutter-sm">
+      <q-btn label="How to use" color="red" @click="howto = true" />
+      <q-dialog v-model="howto">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">HOW TO USE</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <p>Here goes the mini-instruction to use this page:</p>
+          <p>- Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
+          <p>- Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
+          <p>- WHITELIST on exchange management page all the adresses on which you want to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>
+          <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and click TRANSFER button... watch result in right window</p>
+          <p>- Optionally you can observe browser console for a result: press F12 and select console</p>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="I got it" color="red" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
     <div class="col-sm" >
 <!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
-  <div class="q-gutter-md q-pa-md" style="width: 450px; font-size: 11px;">
-    <ul> You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</ul>
-      <q-toggle v-model="usedelay" color="blue" label="Use Time Delay between transfers"/>
+  <div class="q-gutter-md q-pa-md" style="max-width: 450px; font-size: 11px; margin-left: auto;">
+    <q-tooltip anchor="top middle" self="bottom middle">
+      <b>You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</b>
+    </q-tooltip>
+      <q-toggle v-model="usedelay" color="blue" label="Use Time Delay Between Transfers"/>
     </div>
-      <div class="row" style="width: 250px; margin-left: 135px;" v-if="usedelay === true">
+      <div style="max-width: 250px; margin-left: 75px;" v-if="usedelay === true">
         <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
         <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
       </div>
     </div>
   </div>  
   <div class="col-sm" style="align-items: center;">
-    <div class="q-gutter-md q-pa-md" style="width: 350px; margin-left: 15px; font-size: 12px;">
+    <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
       <li></li>
     <ul>fullfill Configuration Params from API OKX</ul>
       <q-input outlined v-model="apiKey" label="apiKey" />
       <q-input outlined v-model="secretKey" label="secretKey" />
       <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
-    <div style="width: 300px; margin-left: 50px; font-size: 11px; max-height: 500px;">
+    <div style="width: 300px; margin-left: 10px; font-size: 11px; max-height: 275px;">
     <ul><b>Here is an operation output</b></ul>
-    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 500px;">
+    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 260px;">
       <q-card-section v-for="item in resulttext" :key="item">
         {{ resulttext }}
       </q-card-section>
@@ -186,7 +213,9 @@ export default {
   </div>
   </div>
 </div>
-<ul>Select arbETH or Ethereum network to withdraw eth asset</ul>
+<div class="row">
+  <div class="col-sm" style="max-width: 450px; margin-left: 390px;">
+<span class="q-gutter-sm"><b>Select Network and asset to withdraw</b></span>
 <div class="q-gutter-md">
     <q-btn-toggle
       v-model="networks"
@@ -199,7 +228,6 @@ export default {
         {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
         ]"/>
 </div>
-<ul><b>Select asset to withdraw</b></ul>
 <div class="q-gutter-md">
     <q-btn-toggle
       v-model="ccy"
@@ -212,12 +240,9 @@ export default {
         {label: 'USDC', value: 'USDC'}
         ]"/>
 </div>
-
-<!--  <div class="q-pa-md q-gutter-sm">
-      {{ result }}
-</div>-->
 </div>
-
+</div>
+</div>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
