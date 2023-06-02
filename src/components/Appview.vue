@@ -144,6 +144,7 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
     <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
     </div>
+    <q-btn fab icon="add" direction="down" color="grey" />
   </div>
   <div class="col-sm" style="max-width: 350px; margin-left: 0px; align-items: left; ">
     <li>
@@ -174,6 +175,8 @@ export default {
           <p>- WHITELIST on exchange management page all the adresses on which you want to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>
           <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and click TRANSFER button... watch result in right window</p>
           <p>- Optionally you can observe browser console for a result: press F12 and select console</p>
+          <p>- Please! Be Aware selecting ETH with AVAXChain will cause an error, Eth is not a proper asset for AVAX network</p>
+          <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
@@ -181,7 +184,7 @@ export default {
       </q-card>
     </q-dialog>
   </div>
-    <div class="col-sm" >
+    <div class="col-sm">
 <!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
   <div class="q-gutter-md q-pa-md" style="max-width: 450px; font-size: 11px; margin-left: auto;">
     <q-tooltip anchor="top middle" self="bottom middle">
@@ -189,9 +192,13 @@ export default {
     </q-tooltip>
       <q-toggle v-model="usedelay" color="blue" label="Use Time Delay Between Transfers"/>
     </div>
-      <div style="max-width: 250px; margin-left: 75px;" v-if="usedelay === true">
+       <div class="row" style="max-width: 300px; margin-left: 75px;" v-if="usedelay === true">
+       <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
+       <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
+      </div>
+      </div>
       </div>
     </div>
   </div>  
@@ -225,6 +232,7 @@ export default {
       :options="[
         {label: 'Arbitrum', value: 'ETH-Arbitrum one'},
         {label: 'Ethereum', value: 'ETH-ERC20'},
+        {label: 'Bitcoin', value: 'BTC-Bitcoin'},
         {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
         ]"/>
 </div>
@@ -237,7 +245,8 @@ export default {
       :options="[
         {label: 'ETH', value: 'ETH'},
         {label: 'USDT', value: 'USDT'},
-        {label: 'USDC', value: 'USDC'}
+        {label: 'USDC', value: 'USDC'},
+        {label: 'BTC', value: 'BTC'}
         ]"/>
 </div>
 </div>
