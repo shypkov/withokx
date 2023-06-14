@@ -1,18 +1,21 @@
 <script>
 /* eslint-disable */ 
 //import { useQuasar } from 'quasar'
+import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
 import CryptoJS from 'crypto-js'
 // import { enc, HmacSHA256 } from 'crypto-js'
 import { ref } from 'vue'
 
-const apiKey = ref();
-const passphrase = ref();
-const secretKey = ref();
+const apiKey = useLocalStorage('apikey', '');
+const passphrase = useLocalStorage('pass', '');
+const secretKey = useLocalStorage('secret', '');
 const fee = ref();
 const adress1 = ref();
 const adress2 = ref();
-const adress3 = ref()
+const adress3 = ref();
+const adress4 = ref();
+const adress5 = ref();
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
@@ -26,7 +29,6 @@ const complete = ref(false);
 const usedelay = ref(false);
 
 //create encrypted hash for OKXsign
-
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
   return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
@@ -78,31 +80,33 @@ const responseError = parsedResponse.msg;
 
 const wdId = parsedResponse.data[0].wdId;
 console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-result = ('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
+result = (`Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
-console.log('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
-result = ('\x1b[33m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
+console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
+result = (`Delaying next withdrawal for ${delay / 1000} seconds...`);
 resulttext.value = [...resulttext.value, result];
 await new Promise(resolve => setTimeout(resolve, delay));
 console.log("")
 }
 
 async function withdrawToArbAddresses() {
-let result = '';
+//let result = '';
+//resulttext.value = [...resulttext.value, 'Started'];
 complete.value=true;
-  try {
-    const wallets = [adress1.value,adress2.value,adress3.value]
+try {
+    const wallets = [adress1.value,adress2.value,adress3.value,adress4.value,adress5.value].filter(w => w && w.length > 0);
     for (const destinationWallet of wallets) {
       await sendTokens({ destinationWallet });
     }
   }
   catch (error)
   {
-console.log('\x1b[31m%s\x1b[0m', `Withdrawal failed:`, error.message);
-result = ('No more adresses can be proceeded', error.message);
+console.log('\x1b[31m%s\x1b[0m', `Failed:`, error.message);
+result = ('Failed', error.message);
 resulttext.value = [...resulttext.value, result];
   }
+//resulttext.value = [...resulttext.value, 'Finished'];
 complete.value=false;
 };
 
@@ -113,6 +117,8 @@ export default {
       adress1,
       adress2,
       adress3,
+      adress4,
+      adress5,
       apiKey,
       secretKey,
       passphrase,
@@ -128,6 +134,7 @@ export default {
       result,
       howto,
       complete,
+//      wallets,
       withdrawToArbAddresses
     } 
 }
@@ -137,16 +144,18 @@ export default {
 <template>
 <div class="container">
   <div class="row"> 
-  <div class="col-sm" style="max-width: 450px; margin-left: auto;">
+  <div class="col-sm" style="max-width: 425px; margin-left: auto;">
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
     <ul>Fill the adress carefully and successively. This form is not validating inputs and stops on empty adress value in field</ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
     <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="adress4" label="Adress4"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="adress5" label="Adress5"/>
     </div>
-    <q-btn fab icon="add" direction="down" color="grey" />
+    <q-btn fab icon="add" color="grey" />
   </div>
-  <div class="col-sm" style="max-width: 350px; margin-left: 0px; align-items: left; ">
+  <div class="col-sm" style="max-width: 350px; margin-left: 20px; align-items: left; ">
     <li>
     <ul>You can set a range of values between min and max to randomize withdraw value</ul>
   </li>
@@ -156,9 +165,9 @@ export default {
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn v-model="complete" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
+      <q-btn v-model="complete" :disabled="complete" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
       <div v-if="complete === true">
-        <q-spinner-box color="primary" size="2em" /> 
+        <q-spinner-box color="primary" size="3em" /> 
         <q-tooltip :offset="[0, 8]">Running</q-tooltip>
       </div>
       <div class="q-pa-md q-gutter-sm">
@@ -166,7 +175,7 @@ export default {
       <q-dialog v-model="howto">
       <q-card>
         <q-card-section>
-          <div class="text-h6">HOW TO USE</div>
+          <div class="text-h8">HOW TO USE</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
           <p>Here goes the mini-instruction to use this page:</p>
@@ -175,8 +184,10 @@ export default {
           <p>- WHITELIST on exchange management page all the adresses on which you want to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>
           <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and click TRANSFER button... watch result in right window</p>
           <p>- Optionally you can observe browser console for a result: press F12 and select console</p>
-          <p>- Please! Be Aware selecting ETH with AVAXChain will cause an error, Eth is not a proper asset for AVAX network</p>
+          <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page! neither switch to another page when PROCESS is Running. If you do - the process will be terminated</p>
+          <p>- Please! Be Aware selecting ETH with AVAXChain will cause an error, Eth or BTC is not a proper asset for AVAX network</p>
           <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
+          <p> MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
@@ -187,22 +198,22 @@ export default {
     <div class="col-sm">
 <!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
   <div class="q-gutter-md q-pa-md" style="max-width: 450px; font-size: 11px; margin-left: auto;">
-    <q-tooltip anchor="top middle" self="bottom middle">
+    <q-tooltip anchor="bottom middle" self="bottom middle">
       <b>You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</b>
     </q-tooltip>
       <q-toggle v-model="usedelay" color="blue" label="Use Time Delay Between Transfers"/>
     </div>
-       <div class="row" style="max-width: 300px; margin-left: 75px;" v-if="usedelay === true">
+       <div class="row" style="max-width: 300px; margin-left: 35px;" v-if="usedelay === true">
        <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
+       </div>
        <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="maxtimedelay" label="max time in seconds"/>
       </div>
       </div>
-      </div>
     </div>
   </div>  
-  <div class="col-sm" style="align-items: center;">
+  <div class="col-sm" style="align-items: center; margin-left: 20px;">
     <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
       <li></li>
     <ul>fullfill Configuration Params from API OKX</ul>
@@ -210,13 +221,14 @@ export default {
       <q-input outlined v-model="secretKey" label="secretKey" />
       <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
-    <div style="width: 300px; margin-left: 10px; font-size: 11px; max-height: 275px;">
+    <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 415px;">
     <ul><b>Here is an operation output</b></ul>
-    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 260px;">
-      <q-card-section v-for="item in resulttext" :key="item">
-        {{ resulttext }}
+    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 415px;">
+      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
+        {{ item }}
       </q-card-section>
     </q-card>
+    <q-btn flat label="clear log screen" color="secondary" @click="resulttext = []" />
   </div>
   </div>
 </div>

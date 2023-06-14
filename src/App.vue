@@ -7,6 +7,9 @@
 </span>
 </div>
   <Appview/>
+<div style="text-align: left; padding-top: 100px">
+<span style="font-size: 9px; text-shadow: 1px 1px 1px black">© created by Cryptopitek</span>
+</div>
 </template>
 
 
