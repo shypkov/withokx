@@ -7,7 +7,7 @@
 </span>
 <div class="q-pa-sm q-gutter-sm">
     <q-badge color="blue">
-      v1.0.2
+      v1.0.3
     </q-badge>
 </div>    
 </div>

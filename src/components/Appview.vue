@@ -11,7 +11,7 @@ const apiKey = useLocalStorage('apikey', '');
 const passphrase = useLocalStorage('pass', '');
 const secretKey = useLocalStorage('secret', '');
 const fee = ref();
-const adress1 = ref();
+const adress1 = useLocalStorage('wallet1', '');
 const adress2 = ref();
 const adress3 = ref();
 const adress4 = ref();
@@ -179,15 +179,14 @@ export default {
         </q-card-section>
         <q-card-section class="q-pt-none">
           <p>Here goes the mini-instruction to use this page:</p>
-          <p>- Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
-          <p>- Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
-          <p>- WHITELIST on exchange management page all the adresses on which you want to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>
-          <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and click TRANSFER button... watch result in right window</p>
-          <p>- Optionally you can observe browser console for a result: press F12 and select console</p>
-          <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page! neither switch to another page when PROCESS is Running. If you do - the process will be terminated</p>
-          <p>- Please! Be Aware selecting ETH with AVAXChain will cause an error, Eth or BTC is not a proper asset for AVAX network</p>
+          <p>- !!!Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
+          <p>- !!!Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
+          <p>- !!!WHITELIST all the adresses on exchange management page on which you wish to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>          
+          <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page when TRANSFER is Running. If you do - the process will be terminated</p>
+          <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and just click TRANSFER button... watch result in log miniscreen</p>
+          <p>- if you see Network error message press F12 in your browser and select console: if you see "net::ERR_NAME_NOT_RESOLVED" you need to wait some time there is nothing you can do</p>
           <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
-          <p> MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
+          <p>- MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
@@ -221,9 +220,9 @@ export default {
       <q-input outlined v-model="secretKey" label="secretKey" />
       <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
-    <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 415px;">
+    <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 430px;">
     <ul><b>Here is an operation output</b></ul>
-    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 415px;">
+    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 430px;">
       <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         {{ item }}
       </q-card-section>
@@ -237,6 +236,7 @@ export default {
 <span class="q-gutter-sm"><b>Select Network and asset to withdraw</b></span>
 <div class="q-gutter-md">
     <q-btn-toggle
+      size="md"
       v-model="ccy"
       push
       glossy
@@ -245,24 +245,84 @@ export default {
         {label: 'ETH', value: 'ETH'},
         {label: 'USDT', value: 'USDT'},
         {label: 'USDC', value: 'USDC'},
-        {label: 'BTC', value: 'BTC'}
+        {label: 'BTC', value: 'BTC'},
+        {label: 'FTM', value: 'FTM'},
+        {label: 'APT', value: 'APT'}
         ]"/>
 </div>
-<div class="q-gutter-md">
-    <q-btn-toggle
+<div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
+    <q-btn-toggle v-if="ccy === 'ETH'"
+      size="sm"
       v-model="networks"
       push
       glossy
       toggle-color="blue"
       :options="[
-        {label: 'Arbitrum', value: 'ETH-Arbitrum One'},
-        {label: 'Optimism', value: 'ETH-Optimism'},
-        {label: 'Ethereum', value: 'ETH-ERC20'},
-//        {label: 'Zksync', value: 'ETH-ZkSync Era'},
-        {label: 'Bitcoin', value: 'BTC-Bitcoin'},
-//        {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
+        {label: 'ETH-ERC20', value: 'ETH-ERC20'},
+        {label: 'ETH-Arbi', value: 'ETH-Arbitrum One'},
+        {label: 'ETH-Opti', value: 'ETH-Optimism'},
+        {label: 'ETH-ZkSync', value: 'ETH-ZkSync Era'}
         ]"/>
+    <q-btn-toggle v-if="ccy === 'USDT'"
+      size="sm"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="cyan"
+      :options="[
+        {label: 'USDT-ERC20', value: 'USDT-ERC20'},
+        {label: 'USDT-Arbi', value: 'USDT-Arbitrum One'},
+        {label: 'USDT-Opti', value: 'USDT-Optimism'},
+        {label: 'USDT-Polygon', value: 'USDT-Polygon'},
+        {label: 'USDT-Avax C', value: 'USDT-Avalanche C-Chain'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'USDC'"
+      size="sm"  
+      v-model="networks"
+      push
+      glossy
+      toggle-color="teal"
+      :options="[
+        {label: 'USDC-ERC20', value: 'USDC-ERC20'},
+        {label: 'USDC-Arbi', value: 'USDC-Arbitrum One (Bridged)'},
+        {label: 'USDC-Opti', value: 'USDC-Optimism'},
+        {label: 'USDC-Polygon', value: 'USDC-Polygon'},
+        {label: 'USDC-Avax C', value: 'USDC-Avalanche C-Chain'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'BTC'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'BTC', value: 'BTC-Bitcoin'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'FTM'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'FANTOM', value: 'FTM-Fantom'}
+        ]"/>    
+    <q-btn-toggle v-if="ccy === 'APT'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'APTOS', value: 'APT-Aptos'}
+        ]"/>              
 </div>
+<!--<q-btn-dropdown label="Special Network">
+      <q-list>
+      <q-item clickable v-close-popup @click="ccy=='MATIC' && networks=='MATIC-Polygon'">MATIC</q-item>
+      <q-item clickable v-close-popup @click="ccy=='FTM' && networks=='FTM-Fantom'">FANTOM</q-item>
+      </q-list>
+</q-btn-dropdown>-->
 </div>
 </div>
 </div>
