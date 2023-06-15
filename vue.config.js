@@ -4,7 +4,7 @@ module.exports = defineConfig({
   pluginOptions: { 
     quasar: {
       importStrategy: 'kebab',
-      rtlSupport: true
+      rtlSupport: false
     }
   }
 }

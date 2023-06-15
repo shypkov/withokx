@@ -5,6 +5,11 @@
 <span>
 <ul><b>This is the multi-transfer from OKX exchange to wallets helper</b></ul>
 </span>
+<div class="q-pa-sm q-gutter-sm">
+    <q-badge color="blue">
+      v1.0.2
+    </q-badge>
+</div>    
 </div>
   <Appview/>
 <div style="text-align: left; padding-top: 100px">

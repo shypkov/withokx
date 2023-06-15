@@ -20,7 +20,7 @@ const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
 const maxtimedelay = ref();
-const networks = ref('ETH-Arbitrum one');
+const networks = ref('ETH-Arbitrum One');
 const ccy = ref('ETH');
 const resulttext = ref([]);
 let result = ref();
@@ -237,19 +237,6 @@ export default {
 <span class="q-gutter-sm"><b>Select Network and asset to withdraw</b></span>
 <div class="q-gutter-md">
     <q-btn-toggle
-      v-model="networks"
-      push
-      glossy
-      toggle-color="blue"
-      :options="[
-        {label: 'Arbitrum', value: 'ETH-Arbitrum one'},
-        {label: 'Ethereum', value: 'ETH-ERC20'},
-        {label: 'Bitcoin', value: 'BTC-Bitcoin'},
-        {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
-        ]"/>
-</div>
-<div class="q-gutter-md">
-    <q-btn-toggle
       v-model="ccy"
       push
       glossy
@@ -259,6 +246,21 @@ export default {
         {label: 'USDT', value: 'USDT'},
         {label: 'USDC', value: 'USDC'},
         {label: 'BTC', value: 'BTC'}
+        ]"/>
+</div>
+<div class="q-gutter-md">
+    <q-btn-toggle
+      v-model="networks"
+      push
+      glossy
+      toggle-color="blue"
+      :options="[
+        {label: 'Arbitrum', value: 'ETH-Arbitrum One'},
+        {label: 'Optimism', value: 'ETH-Optimism'},
+        {label: 'Ethereum', value: 'ETH-ERC20'},
+//        {label: 'Zksync', value: 'ETH-ZkSync Era'},
+        {label: 'Bitcoin', value: 'BTC-Bitcoin'},
+//        {label: 'Avax C-Chain', value: 'Avalanche C-Chain'}
         ]"/>
 </div>
 </div>
