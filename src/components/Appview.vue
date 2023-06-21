@@ -3,6 +3,7 @@
 //import { useQuasar } from 'quasar'
 import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
+import axio from 'axios'
 import CryptoJS from 'crypto-js'
 // import { enc, HmacSHA256 } from 'crypto-js'
 import { ref } from 'vue'
@@ -12,21 +13,29 @@ const passphrase = useLocalStorage('pass', '');
 const secretKey = useLocalStorage('secret', '');
 const fee = ref();
 const adress1 = useLocalStorage('wallet1', '');
-const adress2 = ref();
-const adress3 = ref();
-const adress4 = ref();
-const adress5 = ref();
+const adress2 = useLocalStorage('wallet2', '');
+const adress3 = useLocalStorage('wallet3', '');
+const adress4 = useLocalStorage('wallet4', '');
+const adress5 = useLocalStorage('wallet5', '');
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
 const maxtimedelay = ref();
-const networks = ref('ETH-Arbitrum One');
+const networks = ref('ETH-ERC20');
 const ccy = ref('ETH');
 const resulttext = ref([]);
 let result = ref();
 let howto = ref(false);
-const complete = ref(false);
+const progress = ref(false);
 const usedelay = ref(false);
+//const apiUrl = ref('http://5.75.160.158/api/v5/asset/withdrawal')
+//const testapiUrl = ref('https://api.coingecko.com/api/v3/ping')
+
+//async function testreq() {
+//axio.get('http://5.75.160.158/api/v3/ping')
+//    .then(response => {console.log(response.data)})
+//    .catch(err => {console.error(err)});
+//};
 
 //create encrypted hash for OKXsign
 const generateOKXSign = (timestamp, method, body) => {
@@ -63,6 +72,7 @@ const axios = new Axios({
 });
 
 const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
+
 const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
 const body = JSON.stringify(withdrawalParams)
 // API query const
@@ -93,7 +103,8 @@ console.log("")
 async function withdrawToArbAddresses() {
 //let result = '';
 //resulttext.value = [...resulttext.value, 'Started'];
-complete.value=true;
+//console.log(apiUrl.value, 'current apiURL');
+progress.value=true;
 try {
     const wallets = [adress1.value,adress2.value,adress3.value,adress4.value,adress5.value].filter(w => w && w.length > 0);
     for (const destinationWallet of wallets) {
@@ -107,7 +118,7 @@ result = ('Failed', error.message);
 resulttext.value = [...resulttext.value, result];
   }
 //resulttext.value = [...resulttext.value, 'Finished'];
-complete.value=false;
+progress.value=false;
 };
 
 export default {
@@ -133,8 +144,8 @@ export default {
       resulttext,
       result,
       howto,
-      complete,
-//      wallets,
+      progress,
+//      testreq,
       withdrawToArbAddresses
     } 
 }
@@ -142,6 +153,24 @@ export default {
 </script>
 
 <template>
+<!--
+<div>
+<q-btn-dropdown color="blue" label="Connection">
+  <q-list>
+        <q-item clickable v-close-popup @click="apiUrl === 'http://5.75.160.158/api/v5/asset/withdrawal'">
+          <q-item-section>
+            <q-item-label>Proxy API</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-close-popup @click="apiUrl === 'https://www.okx.cab/api/v5/asset/withdrawal'">
+          <q-item-section>
+            <q-item-label>Direct API</q-item-label>
+          </q-item-section>
+        </q-item>
+  </q-list>
+</q-btn-dropdown>
+</div>-->
+<!--<q-btn color="primary" label="Testrequest" @click="testreq()"/>-->
 <div class="container">
   <div class="row"> 
   <div class="col-sm" style="max-width: 425px; margin-left: auto;">
@@ -153,7 +182,8 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="adress4" label="Adress4"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress5" label="Adress5"/>
     </div>
-    <q-btn fab icon="add" color="grey" />
+
+<!--    <q-btn fab icon="add" color="grey" />-->
   </div>
   <div class="col-sm" style="max-width: 350px; margin-left: 20px; align-items: left; ">
     <li>
@@ -165,8 +195,8 @@ export default {
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn v-model="complete" :disabled="complete" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
-      <div v-if="complete === true">
+      <q-btn v-model="progress" :disabled="progress" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
+      <div v-if="progress">
         <q-spinner-box color="primary" size="3em" /> 
         <q-tooltip :offset="[0, 8]">Running</q-tooltip>
       </div>
@@ -202,7 +232,7 @@ export default {
     </q-tooltip>
       <q-toggle v-model="usedelay" color="blue" label="Use Time Delay Between Transfers"/>
     </div>
-       <div class="row" style="max-width: 300px; margin-left: 35px;" v-if="usedelay === true">
+       <div class="row" style="max-width: 300px; margin-left: 35px;" v-if="usedelay">
        <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
        </div>
@@ -223,9 +253,13 @@ export default {
     <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 430px;">
     <ul><b>Here is an operation output</b></ul>
     <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 430px;">
+      <q-scroll-area
+      v-if="progress"
+      style="height: 250px; max-width: 300px;">
       <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         {{ item }}
       </q-card-section>
+    </q-scroll-area>
     </q-card>
     <q-btn flat label="clear log screen" color="secondary" @click="resulttext = []" />
   </div>
@@ -234,7 +268,7 @@ export default {
 <div class="row">
   <div class="col-sm" style="max-width: 450px; margin-left: 390px;">
 <span class="q-gutter-sm"><b>Select Network and asset to withdraw</b></span>
-<div class="q-gutter-md">
+<div class="q-gutter-md sm-buttons" >
     <q-btn-toggle
       size="md"
       v-model="ccy"
@@ -247,7 +281,12 @@ export default {
         {label: 'USDC', value: 'USDC'},
         {label: 'BTC', value: 'BTC'},
         {label: 'FTM', value: 'FTM'},
-        {label: 'APT', value: 'APT'}
+        {label: 'APT', value: 'APT'},
+        {label: 'MATIC', value: 'MATIC'},
+        {label: 'AVAX', value: 'AVAX'},
+        {label: 'KLAY', value: 'KLAY'},
+        {label: 'BNB', value: 'BNB'},                
+        {label: 'CORE', value: 'CORE'},        
         ]"/>
 </div>
 <div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
@@ -315,7 +354,52 @@ export default {
       toggle-color="brown"
       :options="[
         {label: 'APTOS', value: 'APT-Aptos'}
-        ]"/>              
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'MATIC'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'MATIC', value: 'MATIC-Polygon'}
+        ]"/>           
+    <q-btn-toggle v-if="ccy === 'AVAX'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'AVAX', value: 'AVAX-Avalanche C-Chain'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'KLAY'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="purple"
+      :options="[
+        {label: 'KLAYTN', value: 'KLAY-Klaytn'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'BNB'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="brown"
+      :options="[
+        {label: 'BNB-BSC', value: 'BNB-BSC'}
+        ]"/>
+    <q-btn-toggle v-if="ccy === 'CORE'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="yellow"
+      :options="[
+        {label: 'COREDAO', value: 'CORE-CORE'}
+        ]"/>        
 </div>
 <!--<q-btn-dropdown label="Special Network">
       <q-list>
@@ -345,6 +429,22 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.sm-buttons {
+  .q-btn-group.row.no-wrap.q-btn-group--push.q-btn-group--glossy.inline.q-btn-toggle {
+    padding-left: 40px;
+    width: 450px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .q-btn {
+    width: 55px;
+  }
+  .q-btn-group {
+    box-shadow: none;
+  }
 }
  
 </style>
