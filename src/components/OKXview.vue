@@ -1,11 +1,11 @@
 <script>
 /* eslint-disable */ 
 //import { useQuasar } from 'quasar'
+// import { enc, HmacSHA256 } from 'crypto-js'
+//import axio from 'axios'
 import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
-import axio from 'axios'
 import CryptoJS from 'crypto-js'
-// import { enc, HmacSHA256 } from 'crypto-js'
 import { ref } from 'vue'
 
 const apiKey = useLocalStorage('apikey', '');
@@ -28,11 +28,10 @@ let result = ref();
 let howto = ref(false);
 const progress = ref(false);
 const usedelay = ref(false);
-//const apiUrl = ref('http://5.75.160.158/api/v5/asset/withdrawal')
-//const testapiUrl = ref('https://api.coingecko.com/api/v3/ping')
+const apiUrl = ref('https://api.cryptosapiens.site/api/v5/asset/withdrawal');
 
 //async function testreq() {
-//axio.get('http://5.75.160.158/api/v3/ping')
+//axio.get('http://5.75.160.158/api/v5/market/ticker')
 //    .then(response => {console.log(response.data)})
 //    .catch(err => {console.error(err)});
 //};
@@ -71,12 +70,12 @@ const axios = new Axios({
   }
 });
 
-const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
+//const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
 
 const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
 const body = JSON.stringify(withdrawalParams)
 // API query const
-const response = await axios.post(apiUrl, body, {
+const response = await axios.post(apiUrl.value, body, {
     headers: {
       'OK-ACCESS-TIMESTAMP': TIMESTAMP,
       "OK-ACCESS-SIGN": generateOKXSign(TIMESTAMP, 'POST', body),
@@ -100,7 +99,7 @@ await new Promise(resolve => setTimeout(resolve, delay));
 console.log("")
 }
 
-async function withdrawToArbAddresses() {
+async function withdrawToAddresses() {
 //let result = '';
 //resulttext.value = [...resulttext.value, 'Started'];
 //console.log(apiUrl.value, 'current apiURL');
@@ -145,31 +144,32 @@ export default {
       result,
       howto,
       progress,
+      apiUrl,
 //      testreq,
-      withdrawToArbAddresses
+      withdrawToAddresses
     } 
 }
 }
 </script>
 
 <template>
-<!--
 <div>
 <q-btn-dropdown color="blue" label="Connection">
   <q-list>
-        <q-item clickable v-close-popup @click="apiUrl === 'http://5.75.160.158/api/v5/asset/withdrawal'">
+        <q-item clickable v-close-popup @click="apiUrl = 'https://api.cryptosapiens.site/api/v5/asset/withdrawal'">
           <q-item-section>
             <q-item-label>Proxy API</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="apiUrl === 'https://www.okx.cab/api/v5/asset/withdrawal'">
+        <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'">
           <q-item-section>
             <q-item-label>Direct API</q-item-label>
           </q-item-section>
         </q-item>
   </q-list>
 </q-btn-dropdown>
-</div>-->
+<q-input :readonly="true" label="Selected api direction" v-model="apiUrl"/>
+</div>
 <!--<q-btn color="primary" label="Testrequest" @click="testreq()"/>-->
 <div class="container">
   <div class="row"> 
@@ -195,7 +195,7 @@ export default {
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn v-model="progress" :disabled="progress" color="primary" label="Transfer" @click="withdrawToArbAddresses()" /> 
+      <q-btn v-model="progress" :disabled="progress" color="primary" label="Transfer" @click="withdrawToAddresses()" /> 
       <div v-if="progress">
         <q-spinner-box color="primary" size="3em" /> 
         <q-tooltip :offset="[0, 8]">Running</q-tooltip>
@@ -252,9 +252,8 @@ export default {
     </div>
     <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 430px;">
     <ul><b>Here is an operation output</b></ul>
-    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 430px;">
+    <q-card class="my-card text-white" v-if="progress" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 430px;">
       <q-scroll-area
-      v-if="progress"
       style="height: 250px; max-width: 300px;">
       <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         {{ item }}
@@ -285,8 +284,8 @@ export default {
         {label: 'MATIC', value: 'MATIC'},
         {label: 'AVAX', value: 'AVAX'},
         {label: 'KLAY', value: 'KLAY'},
-        {label: 'BNB', value: 'BNB'},                
-        {label: 'CORE', value: 'CORE'},        
+        {label: 'BNB', value: 'BNB'},
+        {label: 'CORE', value: 'CORE'},
         ]"/>
 </div>
 <div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
@@ -300,7 +299,7 @@ export default {
         {label: 'ETH-ERC20', value: 'ETH-ERC20'},
         {label: 'ETH-Arbi', value: 'ETH-Arbitrum One'},
         {label: 'ETH-Opti', value: 'ETH-Optimism'},
-        {label: 'ETH-ZkSync', value: 'ETH-ZkSync Era'}
+        {label: 'ETH-zkSync', value: 'ETH-zkSync Era'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDT'"
       size="sm"
@@ -409,11 +408,15 @@ export default {
 </q-btn-dropdown>-->
 </div>
 </div>
+
 </div>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+body.body--dark {
+  background: #040404
+}
 h3 {
   font-size: 22px;
   margin: 10px 0 0;
