@@ -1,7 +1,7 @@
 <script>
 /* eslint-disable */ 
 //import { useQuasar } from 'quasar'
-// import { enc, HmacSHA256 } from 'crypto-js'
+//import { enc, HmacSHA256 } from 'crypto-js'
 //import axio from 'axios'
 import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
@@ -28,7 +28,7 @@ let result = ref();
 let howto = ref(false);
 const progress = ref(false);
 const usedelay = ref(false);
-const apiUrl = ref('https://api.cryptosapiens.site/api/v5/asset/withdrawal');
+const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
 
 //async function testreq() {
 //axio.get('http://5.75.160.158/api/v5/market/ticker')
@@ -156,14 +156,14 @@ export default {
 <div>
 <q-btn-dropdown color="blue" label="Connection">
   <q-list>
-        <q-item clickable v-close-popup @click="apiUrl = 'https://api.cryptosapiens.site/api/v5/asset/withdrawal'">
-          <q-item-section>
-            <q-item-label>Proxy API</q-item-label>
-          </q-item-section>
-        </q-item>
         <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'">
           <q-item-section>
-            <q-item-label>Direct API</q-item-label>
+            <q-item-label>Primary API route</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.com/api/v5/asset/withdrawal'">
+          <q-item-section>
+            <q-item-label>Secondary API route</q-item-label>
           </q-item-section>
         </q-item>
   </q-list>
@@ -175,7 +175,7 @@ export default {
   <div class="row"> 
   <div class="col-sm" style="max-width: 425px; margin-left: auto;">
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
-    <ul>Fill the adress carefully and successively. This form is not validating inputs and stops on empty adress value in field</ul>
+    <ul>Fill the adress carefully and successively. This form is not validating inputs</ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
     <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
@@ -209,14 +209,14 @@ export default {
         </q-card-section>
         <q-card-section class="q-pt-none">
           <p>Here goes the mini-instruction to use this page:</p>
-          <p>- !!!Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
           <p>- !!!Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
           <p>- !!!WHITELIST all the adresses on exchange management page on which you wish to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>          
           <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page when TRANSFER is Running. If you do - the process will be terminated</p>
           <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and just click TRANSFER button... watch result in log miniscreen</p>
-          <p>- if you see Network error message press F12 in your browser and select console: if you see "net::ERR_NAME_NOT_RESOLVED" you need to wait some time there is nothing you can do</p>
+          <p>- If you see CORS error!!!Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
+          <p>- if you see Network error message press F12 in your browser and select console: if you see "net::ERR_NAME_NOT_RESOLVED" you need to select another CONNECTION from the dropdown button</p>
           <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
-          <p>- MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
+          <p>- Check actual MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
@@ -299,7 +299,10 @@ export default {
         {label: 'ETH-ERC20', value: 'ETH-ERC20'},
         {label: 'ETH-Arbi', value: 'ETH-Arbitrum One'},
         {label: 'ETH-Opti', value: 'ETH-Optimism'},
-        {label: 'ETH-zkSync', value: 'ETH-zkSync Era'}
+        {label: 'ETH-zkSync', value: 'ETH-zkSync Era'},
+        {label: 'ETH-Linea', value: 'ETH-Linea'},
+        {label: 'ETH-Base', value: 'ETH-Base'},
+        {label: 'ETH-Stark', value: 'ETH-Starknet'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDT'"
       size="sm"

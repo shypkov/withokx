@@ -5214,6 +5214,11 @@ rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
+rollup-plugin-sass-migrator@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-sass-migrator/-/rollup-plugin-sass-migrator-1.0.5.tgz#5e65e5ce1b469f18bb8a2e4bca9fa3452e0f96e1"
+  integrity sha512-25f7+AfPtWm2jd8OWo2KBbpR5UWGhWmDw7e2BwQPaXqOB4mIAcVLB0hJNjJQioa4o2AL1eDsgVLyY51I8hy/vg==
+
 run-parallel@^1.1.9:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.2.0.tgz#66d1368da7bdf921eb9d95bd1a9229e7f21a43ee"
@@ -5243,6 +5248,11 @@ sass-loader@^12.0.0:
   dependencies:
     klona "^2.0.4"
     neo-async "^2.6.2"
+
+sass-migrator@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/sass-migrator/-/sass-migrator-1.7.3.tgz#0ac232b530d78a1b84dfaf24aaccdfd03159acf6"
+  integrity sha512-8JMZ15HMvjE8X3i1NhPu2GQzEIT74xrGACq6J9RzdbJ49N1Fl0lFvfX03+hAQN0MKNYKASq6fx1VZLa5NuwBWw==
 
 sass@1.32.12:
   version "1.32.12"

@@ -39,16 +39,13 @@
           <span style="padding: 10px"><b>Binance Withdraw</b></span>
           </q-item>
       </q-list>
- 
-  </q-drawer>
+   </q-drawer>
 
 <q-page-container>
-
 <span>
 <ul><b>This is the multi-transfer from OKX exchange to wallets helper</b></ul>
 </span>
-
-
+  <router-view />
   <OKXview/>
 </q-page-container>
 </q-layout>
