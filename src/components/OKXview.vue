@@ -279,13 +279,12 @@ export default {
         {label: 'USDT', value: 'USDT'},
         {label: 'USDC', value: 'USDC'},
         {label: 'BTC', value: 'BTC'},
-        {label: 'FTM', value: 'FTM'},
+        {label: 'ZETA', value: 'ZETA'},
         {label: 'APT', value: 'APT'},
         {label: 'MATIC', value: 'MATIC'},
         {label: 'AVAX', value: 'AVAX'},
-        {label: 'KLAY', value: 'KLAY'},
-        {label: 'BNB', value: 'BNB'},
-        {label: 'CORE', value: 'CORE'},
+        {label: 'TON', value: 'TON'},
+        {label: 'BNB', value: 'BNB'}
         ]"/>
 </div>
 <div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
@@ -339,14 +338,14 @@ export default {
       :options="[
         {label: 'BTC', value: 'BTC-Bitcoin'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'Zeta'"
+    <q-btn-toggle v-if="ccy === 'ZETA'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="brown"
       :options="[
-        {label: 'Zeta', value: 'ZETA-ZetaChain'}
+        {label: 'ZETA', value: 'ZETA-ZetaChain'}
         ]"/>    
     <q-btn-toggle v-if="ccy === 'APT'"
       size="md"
