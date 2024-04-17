@@ -299,10 +299,9 @@ export default {
         {label: 'ETH-ERC20', value: 'ETH-ERC20'},
         {label: 'ETH-Arbi', value: 'ETH-Arbitrum One'},
         {label: 'ETH-Opti', value: 'ETH-Optimism'},
-        {label: 'ETH-zkSync', value: 'ETH-zkSync Era'},
-        {label: 'ETH-Linea', value: 'ETH-Linea'},
         {label: 'ETH-Base', value: 'ETH-Base'},
-        {label: 'ETH-Stark', value: 'ETH-Starknet'}
+        {label: 'ETH-Linea', value: 'ETH-Linea'},
+        {label: 'ETH-XLayer', value: 'ETH-X Layer'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDT'"
       size="sm"
@@ -312,10 +311,11 @@ export default {
       toggle-color="cyan"
       :options="[
         {label: 'USDT-ERC20', value: 'USDT-ERC20'},
-        {label: 'USDT-Arbi', value: 'USDT-Arbitrum One'},
-        {label: 'USDT-Opti', value: 'USDT-Optimism'},
+        {label: 'USDT-TRC20', value: 'USDT-TRC20'},
+        {label: 'USDT-Solana', value: 'USDT-Solana'},
         {label: 'USDT-Polygon', value: 'USDT-Polygon'},
-        {label: 'USDT-Avax C', value: 'USDT-Avalanche C-Chain'}
+        {label: 'USDT-XLayer', value: 'USDT-X Layer'},
+        {label: 'USDT-Arbi', value: 'USDT-Arbitrum One'}        
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDC'"
       size="sm"  
@@ -325,10 +325,10 @@ export default {
       toggle-color="teal"
       :options="[
         {label: 'USDC-ERC20', value: 'USDC-ERC20'},
-        {label: 'USDC-Arbi', value: 'USDC-Arbitrum One (Bridged)'},
-        {label: 'USDC-Opti', value: 'USDC-Optimism'},
+        {label: 'USDC-Solana', value: 'USDC-Solana'},
         {label: 'USDC-Polygon', value: 'USDC-Polygon'},
-        {label: 'USDC-Avax C', value: 'USDC-Avalanche C-Chain'}
+        {label: 'USDC-XLayer', value: 'USDC-X Layer'},
+        {label: 'USDC-Arbi', value: 'USDC-Arbitrum One'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'BTC'"
       size="md"
@@ -339,14 +339,14 @@ export default {
       :options="[
         {label: 'BTC', value: 'BTC-Bitcoin'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'FTM'"
+    <q-btn-toggle v-if="ccy === 'Zeta'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="brown"
       :options="[
-        {label: 'FANTOM', value: 'FTM-Fantom'}
+        {label: 'Zeta', value: 'ZETA-ZetaChain'}
         ]"/>    
     <q-btn-toggle v-if="ccy === 'APT'"
       size="md"
@@ -365,7 +365,7 @@ export default {
       toggle-color="brown"
       :options="[
         {label: 'MATIC', value: 'MATIC-Polygon'}
-        ]"/>           
+        ]"/>
     <q-btn-toggle v-if="ccy === 'AVAX'"
       size="md"
       v-model="networks"
@@ -375,14 +375,14 @@ export default {
       :options="[
         {label: 'AVAX', value: 'AVAX-Avalanche C-Chain'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'KLAY'"
+    <q-btn-toggle v-if="ccy === 'TON'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="purple"
       :options="[
-        {label: 'KLAYTN', value: 'KLAY-Klaytn'}
+        {label: 'TON', value: 'TON-TON'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'BNB'"
       size="md"
@@ -392,16 +392,7 @@ export default {
       toggle-color="brown"
       :options="[
         {label: 'BNB-BSC', value: 'BNB-BSC'}
-        ]"/>
-    <q-btn-toggle v-if="ccy === 'CORE'"
-      size="md"
-      v-model="networks"
-      push
-      glossy
-      toggle-color="yellow"
-      :options="[
-        {label: 'COREDAO', value: 'CORE-CORE'}
-        ]"/>        
+        ]"/>    
 </div>
 <!--<q-btn-dropdown label="Special Network">
       <q-list>

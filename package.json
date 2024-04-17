@@ -26,7 +26,7 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "rollup-plugin-sass-migrator": "^1.0.5",
-    "sass": "1.32.12",
+    "sass": "1.33.0",
     "sass-loader": "^12.0.0",
     "sass-migrator": "^1.7.3",
     "vue-cli-plugin-quasar": "~5.0.2"

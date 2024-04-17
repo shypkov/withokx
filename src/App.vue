@@ -26,17 +26,11 @@
           </q-item-section>
           <span style="padding: 10px"><b>OKX Withdraw</b></span>
           </q-item>
-          <q-item  :disabled="true" clickable target="MEXC" rel="noopener">
+          <q-item  :disabled="true" clickable target="Bybit" rel="noopener">
           <q-item-section avatar>
-            <div style="font-size: 10px; text-align: center;"><img alt="mexc logo" width="40" height="40" src="./assets/mexc.png"></div>   
+            <div style="font-size: 10px; text-align: center;"><img alt="bybit logo" width="40" height="40" src="./assets/bybit.png"></div>   
           </q-item-section>
-          <span style="padding: 10px"><b>MEXC Withdraw</b></span>
-          </q-item>
-          <q-item  :disabled="true" clickable target="Binance" rel="noopener">
-          <q-item-section avatar>
-            <div style="font-size: 10px; text-align: center;"><img alt="mexc logo" width="40" height="40" src="./assets/bina.png"></div>   
-          </q-item-section>
-          <span style="padding: 10px"><b>Binance Withdraw</b></span>
+          <span style="padding: 10px"><b>Bybit Withdraw</b></span>
           </q-item>
       </q-list>
    </q-drawer>
