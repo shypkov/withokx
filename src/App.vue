@@ -17,30 +17,52 @@
       <q-list>
         <q-item-label header>
           <div class="q-pa-md q-gutter-md" style="padding: 30px">
-            <q-badge color="blue">version1.1.0</q-badge>
+            <q-badge color="blue">version1.2.2</q-badge>
           </div>
         </q-item-label>
-        <q-item clickable target="OKX" rel="noopener" href="/OKXview">
-          <q-item-section avatar>
-            <div style="font-size: 10px; text-align: center;"><img alt="okx logo" width="40" height="40" src="./assets/okx.png"></div>   
-          </q-item-section>
+        <q-item
+         clickable
+         v-ripple
+         :active="link === 'OKXview'"
+         @click="link = 'OKXview'"
+         active-class="menu-link"
+         to="/OKXview">
+         <q-item-section avatar>
+            <div style="font-size: 10px; text-align: center;"><img alt="okx" width="40" height="40" src="./assets/okx.png"></div>   
+         </q-item-section>
           <span style="padding: 10px"><b>OKX Withdraw</b></span>
-          </q-item>
-          <q-item  :disabled="true" clickable target="Bybit" rel="noopener">
-          <q-item-section avatar>
-            <div style="font-size: 10px; text-align: center;"><img alt="bybit logo" width="40" height="40" src="./assets/bybit.png"></div>   
-          </q-item-section>
+        </q-item>
+        <q-separator spaced />
+        <q-item
+         clickable
+         v-ripple
+         :active="link === 'Bybitview'"
+         @click="link = 'Bybitview'"
+         active-class="menu-link"
+         to="/Bybitview">
+         <q-item-section avatar>
+           <div style="font-size: 10px; text-align: center;"><img alt="bybit" width="40" height="40" src="./assets/bybit.png"></div>   
+         </q-item-section>
           <span style="padding: 10px"><b>Bybit Withdraw</b></span>
-          </q-item>
+        </q-item>
       </q-list>
    </q-drawer>
 
 <q-page-container>
 <span>
-<ul><b>This is the multi-transfer from OKX exchange to wallets helper</b></ul>
+<ul>
+<b>
+
+</b>
+</ul>
 </span>
-  <router-view />
+<OKXview/>
+<template id="OKXview">
   <OKXview/>
+</template>
+<template id="Bybitview">
+  <Bybitview/>
+</template>
 </q-page-container>
 </q-layout>
 </template>
@@ -48,14 +70,24 @@
 <script>
 import Header from './components/Header.vue';
 import OKXview from './components/OKXview.vue';
+import Bybitview from './components/Bybitview.vue';
 import { ref } from 'vue';
+//import router from 'vue-router';
 const leftMenu = ref(true);
+
+//const okxview = {  name: "okxview ",  template: "#okxview"};
+//const bybitview = {  name: "bybitview",  template: "#bybitview"};
+//  const routes = [
+//  { path: "/OKXview", component: okxview},
+//{ path: "/Bybitview", component: bybitview}];
+//const router = new VueRouter({  routes}); 
 
 export default {
   name: 'App',
   components: {
-    OKXview,
     Header,
+    OKXview,
+    Bybitview,
   },
   setup ()
   {
@@ -77,8 +109,14 @@ export default {
   color: #2c3e50;
   margin-top: 30px;
 }
+
 .okx{
   margin-left: 30px;
   text-align: center;
+}
+
+.menu-link
+{
+  background: #F2C037;
 }
 </style>

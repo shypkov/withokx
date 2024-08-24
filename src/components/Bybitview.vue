@@ -9,9 +9,6 @@ import CryptoJS from 'crypto-js'
 import { ref } from 'vue'
 
 const apiKey = useLocalStorage('apikey', '');
-const passphrase = useLocalStorage('pass', '');
-const secretKey = useLocalStorage('secret', '');
-const fee = ref();
 const adress1 = useLocalStorage('wallet1', '');
 const adress2 = useLocalStorage('wallet2', '');
 const adress3 = useLocalStorage('wallet3', '');
@@ -21,14 +18,15 @@ const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
 const maxtimedelay = ref();
-const networks = ref('ETH-ERC20');
-const ccy = ref('ETH');
-const resulttext = ref([]);
+const chain = ref('ETH');
+const coin = ref('ETH');
 let result = ref();
 let howto = ref(false);
 const progress = ref(false);
 const usedelay = ref(false);
-const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
+const apiUrl = ref('https://api.bybit.com/v5/asset/withdraw/create');
+const resulttext = ref([]);
+//const recvWindow = 5000;
 
 //async function testreq() {
 //axio.get('http://5.75.160.158/api/v5/market/ticker')
@@ -36,10 +34,9 @@ const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
 //    .catch(err => {console.error(err)});
 //};
 
-//create encrypted hash for OKXsign
-const generateOKXSign = (timestamp, method, body) => {
-  const withdrawalEndpoint = '/api/v5/asset/withdrawal';
-  return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
+//create encrypted hash for sign
+const bybitsign = (timestamp, body) => {
+  return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + apiKey.value + 5000 + body))
 };
 
 //random number for withdrawal amount
@@ -50,15 +47,12 @@ function getRandomNumber(min, max, fixed) {
 };
 
 async function sendTokens({ destinationWallet }) {
-//const ON_CHAIN = 4;
 var ammount = getRandomNumber(Number(minWithdrawal.value), Number(maxWithdrawal.value), 4);
 
 const withdrawalParams = {
     amt: ammount,
-    fee: fee.value,
-    dest: 4,
-    ccy: ccy.value,
-    chain: networks.value,
+    coin: coin.value,
+    chain: chain.value,
     toAddr: destinationWallet
   };
 
@@ -66,13 +60,12 @@ const axios = new Axios({
   headers: {
     'Content-Type': 'application/json',
     'OK-ACCESS-KEY': apiKey.value,
-    'OK-ACCESS-PASSPHRASE': passphrase.value
   }
 });
 
 //const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
-
-const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
+//const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
+var TIMESTAMP = Date.now().toString();
 const body = JSON.stringify(withdrawalParams)
 // API query const
 const response = await axios.post(apiUrl.value, body, {
@@ -81,6 +74,7 @@ const response = await axios.post(apiUrl.value, body, {
       "OK-ACCESS-SIGN": generateOKXSign(TIMESTAMP, 'POST', body),
     }
   })
+
 const parsedResponse = JSON.parse(response.data);
 const responseError = parsedResponse.msg;
   if (responseError && responseError.length > 0) {
@@ -88,8 +82,8 @@ const responseError = parsedResponse.msg;
   }
 
 const wdId = parsedResponse.data[0].wdId;
-console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-result = (`Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
+console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.coin} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
+result = (`Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.coin} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
@@ -130,16 +124,13 @@ export default {
       adress4,
       adress5,
       apiKey,
-      secretKey,
-      passphrase,
       minWithdrawal,
       maxWithdrawal,
-      fee,
       mintimedelay,
       maxtimedelay,
       usedelay,
-      networks,
-      ccy,
+      chain,
+      coin,
       resulttext,
       result,
       howto,
@@ -156,12 +147,12 @@ export default {
 <div>
 <q-btn-dropdown color="blue" label="Connection">
   <q-list>
-        <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'">
+        <q-item clickable v-close-popup @click="apiUrl = 'https://api.bybit.com/v5/asset/withdraw/create'">
           <q-item-section>
             <q-item-label>Primary API route</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.com/api/v5/asset/withdrawal'">
+        <q-item clickable v-close-popup @click="apiUrl = 'https://api.bytick.com/v5/asset/withdraw/create'">
           <q-item-section>
             <q-item-label>Secondary API route</q-item-label>
           </q-item-section>
@@ -192,7 +183,6 @@ export default {
     <div class="q-gutter-md" style="width: 250px; margin-left: 60px;">
       <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal value" />
       <q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal value" />
-      <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
     <ul>Press Transfer Button to complete transfer</ul>
       <q-btn v-model="progress" :disabled="progress" color="primary" label="Transfer" @click="withdrawToAddresses()" /> 
@@ -209,14 +199,13 @@ export default {
         </q-card-section>
         <q-card-section class="q-pt-none">
           <p>Here goes the mini-instruction to use this page:</p>
-          <p>- !!!Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
-          <p>- !!!WHITELIST all the adresses on exchange management page on which you wish to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>          
-          <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page when TRANSFER is Running. If you do - the process will be terminated</p>
+          <p>- 1. Create an API KEY visit here <a href='https://www.bybit.com/app/user/add-secret-key?type=auto'></a></p>
+          <p>- 1.1 Use API generator <a href='https://github.com/bybit-exchange/api-rsa-generator/releases'></a> to create API key</p>
+          <p>- 2. WHITELIST all the external adresses on exchange management page manually on which you wish to accept withdrawals here <a href='https://www.bybit.com/user/assets/money-address'></a></p>
+          <p>- 3. Add next ip adress for withdrawals: 185.199.110.153 </p>
           <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and just click TRANSFER button... watch result in log miniscreen</p>
-          <p>- If you see CORS error!!!Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
-          <p>- if you see Network error message press F12 in your browser and select console: if you see "net::ERR_NAME_NOT_RESOLVED" you need to select another CONNECTION from the dropdown button</p>
-          <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
-          <p>- Check actual MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
+          <p>- Bybit takes it withdrawal fee automatically</p>
+          <p>- Notification! PLEASE DO NOT "RELOAD or CLOSE THIS Page" when TRANSFER is Running. If you do so - the process will be terminated</p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
@@ -245,10 +234,8 @@ export default {
   <div class="col-sm" style="align-items: center; margin-left: 20px;">
     <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
       <li></li>
-    <ul>fullfill Configuration Params from API OKX</ul>
+    <ul>fullfill Configuration Params from API Bybit</ul>
       <q-input outlined v-model="apiKey" label="apiKey" />
-      <q-input outlined v-model="secretKey" label="secretKey" />
-      <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
     <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 430px;">
     <ul><b>Here is an operation output</b></ul>
@@ -266,11 +253,11 @@ export default {
 </div>
 <div class="row">
   <div class="col-sm" style="max-width: 450px; margin-left: 390px;">
-<span class="q-gutter-sm"><b>Select Chain to withdraw</b></span>
+<span class="q-gutter-sm"><b>Select chain and asset to withdraw</b></span>
 <div class="q-gutter-md sm-buttons" >
     <q-btn-toggle
       size="md"
-      v-model="ccy"
+      v-model="coin"
       push
       glossy
       toggle-color="green"
@@ -279,129 +266,101 @@ export default {
         {label: 'USDT', value: 'USDT'},
         {label: 'USDC', value: 'USDC'},
         {label: 'BTC', value: 'BTC'},
-        {label: 'BNB', value: 'BNB'},
-        {label: 'APT', value: 'APT'},
-        {label: 'MATIC', value: 'MATIC'},
-        {label: 'AVAX', value: 'AVAX'},
-        {label: 'TON', value: 'TON'},
-        {label: 'SOL', value: 'SOL'},
-        {label: 'ZETA', value: 'ZETA'}
+        {label: 'MANTLE', value: 'MNT'},
+        {label: 'MATIC', value: 'POL'},
+        {label: 'TON', value: 'TON'},        
+        {label: 'SOLANA', value: 'SOL'}
         ]"/>
 </div>
-<span class="q-gutter-sm"><b>Select asset to withdraw</b></span>
 <div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
-    <q-btn-toggle v-if="ccy === 'ETH'"
+    <q-btn-toggle v-if="coin === 'ETH'"
       size="sm"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="blue"
       :options="[
-        {label: 'ERC20', value: 'ETH-ERC20'},
-        {label: 'Arbi', value: 'ETH-Arbitrum One'},
-        {label: 'Base', value: 'ETH-Base'},
-        {label: 'Linea', value: 'ETH-Linea'},
-        {label: 'XLayer', value: 'ETH-X Layer'}
+        {label: 'ETH-ERC20', value: 'ERC20'},
+        {label: 'ETH-Linea', value: 'Linea'},
+        {label: 'ETH-zkSync', value: 'zkSync Era'},
+        {label: 'ETH-Base', value: 'Base Mainnet'},
+        {label: 'ETH-BEP20', value: 'BSC (BEP20)'},
+        {label: 'ETH-Arbi', value: 'Arbitrum One'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'USDT'"
+    <q-btn-toggle v-if="coin === 'USDT'"
       size="sm"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="cyan"
       :options="[
-        {label: 'ERC20', value: 'USDT-ERC20'},
-        {label: 'TRC20', value: 'USDT-TRC20'},
-        {label: 'SOL', value: 'USDT-Solana'},
-        {label: 'Polygon', value: 'USDT-Polygon'},
-        {label: 'XLayer', value: 'USDT-X Layer'},
-        {label: 'Arbi', value: 'USDT-Arbitrum One'}        
+        {label: 'USDT-ERC20', value: 'ERC20'},
+        {label: 'USDT-TRC20', value: 'TRC20'},
+        {label: 'USDT-Solana', value: 'SOL'},
+        {label: 'USDT-Polygon', value: 'MATIC'},
+        {label: 'USDT-TON', value: 'TON'},
+        {label: 'USDT-Arbi', value: 'Arbitrum One'}        
         ]"/>
-    <q-btn-toggle v-if="ccy === 'USDC'"
+    <q-btn-toggle v-if="coin === 'USDC'"
       size="sm"  
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="teal"
       :options="[
-        {label: 'ERC20', value: 'USDC-ERC20'},
-        {label: 'Solana', value: 'USDC-Solana'},
-        {label: 'Polygon', value: 'USDC-Polygon'},
-        {label: 'XLayer', value: 'USDC-X Layer'},
-        {label: 'Arbi', value: 'USDC-Arbitrum One'}
+        {label: 'USDC-ERC20', value: 'ERC20'},
+        {label: 'USDC-Solana', value: 'Mantle Network'},
+        {label: 'USDC-Polygon', value: 'Polygon PoS'},
+        {label: 'USDC-SOL', value: 'SOL'},
+        {label: 'USDC-Arbi', value: 'Arbitrum One'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'BTC'"
+    <q-btn-toggle v-if="coin === 'BTC'"
       size="md"
-      v-model="networks"
-      push
-      glossy
-      toggle-color="dark"
-      :options="[
-        {label: 'BTC', value: 'BTC-Bitcoin'}
-        ]"/>
-    <q-btn-toggle v-if="ccy === 'BNB'"
-      size="md"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="brown"
       :options="[
-        {label: 'BNB-BSC', value: 'BNB-BSC'}
-        ]"/>  
-    <q-btn-toggle v-if="ccy === 'APT'"
+        {label: 'BTC', value: 'BTC'}
+        ]"/>
+    <q-btn-toggle v-if="coin === 'MNT'"
       size="md"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
-      toggle-color="grey"
+      toggle-color="brown"
       :options="[
-        {label: 'APTOS', value: 'APT-Aptos'}
-        ]"/>
-    <q-btn-toggle v-if="ccy === 'MATIC'"
+        {label: 'MNT-Mantle', value: 'Mantle Network'},
+        {label: 'MNT-ERC20', value: 'ERC20'}
+        ]"/>    
+    <q-btn-toggle v-if="coin === 'MATIC'"
       size="md"
-      v-model="networks"
-      push
-      glossy
-      toggle-color="green"
-      :options="[
-        {label: 'MATIC', value: 'MATIC-Polygon'}
-        ]"/>
-    <q-btn-toggle v-if="ccy === 'AVAX'"
-      size="md"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="yellow"
       :options="[
-        {label: 'AVAX C-Chain', value: 'AVAX-Avalanche C-Chain'}
+        {label: 'MATIC-Pol', value: 'MATIC'},
+        {label: 'MATIC-ERC20', value: 'ERC20'},
         ]"/>
-    <q-btn-toggle v-if="ccy === 'TON'"
+    <q-btn-toggle v-if="coin === 'TON'"
       size="md"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
       toggle-color="purple"
       :options="[
-        {label: 'TON', value: 'TON-TON'}
+        {label: 'TON', value: 'TON'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'SOL'"
+    <q-btn-toggle v-if="coin === 'SOL'"
       size="md"
-      v-model="networks"
+      v-model="chain"
       push
       glossy
-      toggle-color="blue"
+      toggle-color="gold"
       :options="[
-        {label: 'SOLANA', value: 'SOL-Solana'}
+        {label: 'SOLANA', value: 'SOL'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'ZETA'"
-      size="md"
-      v-model="networks"
-      push
-      glossy
-      toggle-color="blue"
-      :options="[
-        {label: 'ZETA', value: 'ZETA-ZetaChain'}
-        ]"/>      
 </div>
 </div>
 </div>
