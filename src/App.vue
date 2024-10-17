@@ -17,7 +17,7 @@
       <q-list>
         <q-item-label header>
           <div class="q-pa-md q-gutter-md" style="padding: 30px">
-            <q-badge color="blue">version1.2.2</q-badge>
+            <q-badge color="blue">version1.2.3</q-badge>
           </div>
         </q-item-label>
         <q-item
