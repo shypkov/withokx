@@ -36,14 +36,14 @@
         <q-item
          clickable
          v-ripple
-         :active="link === 'Bybitview'"
-         @click="link = 'Bybitview'"
+         :active="link === 'Bitgetview'"
+         @click="link = 'Bitgetview'"
          active-class="menu-link"
-         to="/Bybitview">
+         to="/Bitgetview">
          <q-item-section avatar>
-           <div style="font-size: 10px; text-align: center;"><img alt="bybit" width="40" height="40" src="./assets/bybit.png"></div>   
+           <div style="font-size: 10px; text-align: center;"><img alt="bybit" width="40" height="40" src="./assets/bitget.png"></div>
          </q-item-section>
-          <span style="padding: 10px"><b>Bybit Withdraw</b></span>
+          <span style="padding: 10px"><b>Bitget Withdraw</b></span>
         </q-item>
       </q-list>
    </q-drawer>
@@ -70,7 +70,7 @@
 <script>
 import Header from './components/Header.vue';
 import OKXview from './components/OKXview.vue';
-import Bybitview from './components/Bybitview.vue';
+import Bybitview from './components/Bitget.vue';
 import { ref } from 'vue';
 //import router from 'vue-router';
 const leftMenu = ref(true);

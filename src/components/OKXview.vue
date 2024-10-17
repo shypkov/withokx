@@ -153,7 +153,7 @@ export default {
 </script>
 
 <template>
-<div>
+<div style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">
 <q-btn-dropdown color="blue" label="Connection">
   <q-list>
         <q-item clickable v-close-popup @click="apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'">
@@ -170,10 +170,16 @@ export default {
 </q-btn-dropdown>
 <q-input :readonly="true" label="Selected api direction" v-model="apiUrl"/>
 </div>
+
 <!--<q-btn color="primary" label="Testrequest" @click="testreq()"/>-->
 <div class="container">
-  <div class="row"> 
-  <div class="col-sm" style="max-width: 425px; margin-left: auto;">
+  <div class="row" style="width: 1200px; margin-left: 20px;">
+  <q-card>
+    
+    <div class="row" style="width: 1180px; margin-left: 20px;">
+
+    <div class="col-sm" style="max-width: 400px; margin-left: auto;">
+
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
     <ul>Fill the adress carefully and successively. This form is not validating inputs</ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
@@ -226,7 +232,7 @@ export default {
   </div>
     <div class="col-sm">
 <!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
-  <div class="q-gutter-md q-pa-md" style="max-width: 450px; font-size: 11px; margin-left: auto;">
+  <div class="q-gutter-md q-pa-md" style="max-width: 400px; font-size: 11px; margin-left: auto;">
     <q-tooltip anchor="bottom middle" self="bottom middle">
       <b>You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</b>
     </q-tooltip>
@@ -245,28 +251,23 @@ export default {
   <div class="col-sm" style="align-items: center; margin-left: 20px;">
     <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
       <li></li>
-    <ul>fullfill Configuration Params from API OKX</ul>
+    <ul><b>fullfill Configuration Params from API OKX</b></ul>
       <q-input outlined v-model="apiKey" label="apiKey" />
       <q-input outlined v-model="secretKey" label="secretKey" />
       <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
-    <div style="width: 300px; margin-left: 20px; font-size: 10px; max-height: 430px;">
-    <ul><b>Here is an operation output</b></ul>
-    <q-card class="my-card text-white" v-if="progress" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%); max-height: 430px;">
-      <q-scroll-area
-      style="height: 250px; max-width: 300px;">
-      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
-        {{ item }}
-      </q-card-section>
-    </q-scroll-area>
-    </q-card>
-    <q-btn flat label="clear log screen" color="secondary" @click="resulttext = []" />
-  </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm" style="max-width: 450px; margin-left: 390px;">
-<span class="q-gutter-sm"><b>Select Chain to withdraw</b></span>
+</q-card>
+</div>
+<div style="height: 10px">
+  <q-space />
+</div>
+
+<div class="row" style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">
+  <q-card>
+<span class="q-gutter-sm"><b>Select Chain & Asset to withdraw</b></span>
+<div class="col-sm" style="width: 800px; margin-left: 400px;">
 <div class="q-gutter-md sm-buttons" >
     <q-btn-toggle
       size="md"
@@ -288,7 +289,6 @@ export default {
         {label: 'ZETA', value: 'ZETA'}
         ]"/>
 </div>
-<span class="q-gutter-sm"><b>Select asset to withdraw</b></span>
 <div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
     <q-btn-toggle v-if="ccy === 'ETH'"
       size="sm"
@@ -404,8 +404,24 @@ export default {
         ]"/>      
 </div>
 </div>
+</q-card>
 </div>
 
+<div style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">
+    <q-btn flat label="Press to empty console screen" color="secondary" @click="resulttext = []" />
+    <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 30%, #194f88 100%);">
+      <ul><b>Console output</b></ul>
+      <q-separator dark inset />
+      <q-scroll-area style="height: 250px; max-width: 300px;">
+      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
+        <q-separator dark inset />
+        {{ item }}
+        <q-separator dark inset />
+      </q-card-section>
+    </q-scroll-area>
+    </q-card>
+
+  </div>
 </div>
 </template>
 
