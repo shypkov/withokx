@@ -2,7 +2,8 @@
 /* eslint-disable */ 
 //import { useQuasar } from 'quasar'
 //import { enc, HmacSHA256 } from 'crypto-js'
-//import axio from 'axios'
+import axios from 'axios'
+//import crypto from 'cryptoJS'
 import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
 import CryptoJS from 'crypto-js'
@@ -29,14 +30,49 @@ let howto = ref(false);
 const progress = ref(false);
 const usedelay = ref(false);
 const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
+const baseUrl = ref('https://www.okx.com');
 
-//async function testreq() {
-//axio.get('http://5.75.160.158/api/v5/market/ticker')
-//    .then(response => {console.log(response.data)})
-//    .catch(err => {console.error(err)});
-//};
 
-//create encrypted hash for OKXsign
+async function OKXminfee() {
+  try {
+const timestamp = new Date().toISOString().split('.')[0] + "Z";
+const method = 'GET';
+const getUrl = '/api/v5/asset/currencies?ccy='+ccy.value;
+const body = '';
+const getSig = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + getUrl + body, secretKey.value));
+//axios.get(getUrl)
+//.then(response => {console.log(response.data)})
+//.catch(err => {console.error(err)});
+const response = await axios.get(baseUrl.value + getUrl, {
+    method: method,
+    url: getUrl,
+    headers: {
+        'Content-Type': 'application/json',
+        'OK-ACCESS-SIGN': getSig,
+        'OK-ACCESS-KEY': apiKey.value,
+        'OK-ACCESS-TIMESTAMP': timestamp,
+        'OK-ACCESS-PASSPHRASE': passphrase.value
+    }
+});
+const parsedResponse = response.data;
+const responseError = parsedResponse.msg;
+  
+if (responseError && responseError.length > 0) {
+    throw new Error(`Error : ${responseError}`);}
+
+const minFee = parsedResponse.data[0].minFee;
+const chain = parsedResponse.data[0].chain;
+resulttext.value = [...resulttext.value, minFee, chain];
+//console.log(`minimum fee: ${minFee}`);
+console.log(response.data);
+}
+catch (error)
+{
+  console.error(`Error: ${error.message}`);
+};
+};
+
+//create encrypted hash for OKXsign for withdraw
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
   return CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + withdrawalEndpoint + body, secretKey.value))
@@ -70,15 +106,13 @@ const axios = new Axios({
   }
 });
 
-//const apiUrl = 'https://www.okx.cab/api/v5/asset/withdrawal'
-
 const TIMESTAMP = new Date().toISOString().split('.')[0] + "Z"
 const body = JSON.stringify(withdrawalParams)
 // API query const
 const response = await axios.post(apiUrl.value, body, {
     headers: {
       'OK-ACCESS-TIMESTAMP': TIMESTAMP,
-      "OK-ACCESS-SIGN": generateOKXSign(TIMESTAMP, 'POST', body),
+      'OK-ACCESS-SIGN': generateOKXSign(TIMESTAMP, 'POST', body),
     }
   })
 const parsedResponse = JSON.parse(response.data);
@@ -89,7 +123,7 @@ const responseError = parsedResponse.msg;
 
 const wdId = parsedResponse.data[0].wdId;
 console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-result = (`Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
+result = (new Date().toString() `Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
@@ -102,7 +136,6 @@ console.log("")
 async function withdrawToAddresses() {
 //let result = '';
 //resulttext.value = [...resulttext.value, 'Started'];
-//console.log(apiUrl.value, 'current apiURL');
 progress.value=true;
 try {
     const wallets = [adress1.value,adress2.value,adress3.value,adress4.value,adress5.value].filter(w => w && w.length > 0);
@@ -145,7 +178,7 @@ export default {
       howto,
       progress,
       apiUrl,
-//      testreq,
+      OKXminfee,
       withdrawToAddresses
     } 
 }
@@ -171,7 +204,6 @@ export default {
 <q-input :readonly="true" label="Selected api direction" v-model="apiUrl"/>
 </div>
 
-<!--<q-btn color="primary" label="Testrequest" @click="testreq()"/>-->
 <div class="container">
   <div class="row" style="width: 1200px; margin-left: 20px;">
   <q-card>
@@ -181,19 +213,19 @@ export default {
     <div class="col-sm" style="max-width: 400px; margin-left: auto;">
 
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
-    <ul>Fill the adress carefully and successively. This form is not validating inputs</ul>
-    <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Adress1"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Adress2"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Adress3"/> 
-    <q-input standout="bg-teal text-white" stack-label v-model="adress4" label="Adress4"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="adress5" label="Adress5"/>
+    <ul><b>Fill the address carefully and successively. This form is not validating inputs</b></ul>
+    <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Address1"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="adress2" label="Address2"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="adress3" label="Address3"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="adress4" label="Address4"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="adress5" label="Address5"/>
     </div>
 
 <!--    <q-btn fab icon="add" color="grey" />-->
   </div>
   <div class="col-sm" style="max-width: 350px; margin-left: 20px; align-items: left; ">
     <li>
-    <ul>You can set a range of values between min and max to randomize withdraw value</ul>
+    <ul><b>You can set a range of values between min and max to randomize withdraw value</b></ul>
   </li>
     <div class="q-gutter-md" style="width: 250px; margin-left: 60px;">
       <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal value" />
@@ -230,15 +262,25 @@ export default {
       </q-card>
     </q-dialog>
   </div>
-    <div class="col-sm">
-<!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />-->
-  <div class="q-gutter-md q-pa-md" style="max-width: 400px; font-size: 11px; margin-left: auto;">
+  </div>  
+
+  <div class="col-sm" style="align-items: center; margin-left: 20px;">
+    <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
+      <li></li>
+    <ul><b>fullfill Configuration Params from API OKX</b></ul>
+      <q-input outlined v-model="apiKey" label="apiKey" />
+      <q-input outlined v-model="secretKey" label="secretKey" />
+      <q-input outlined v-model="passphrase" label="Passphrase" />
+    </div>
+
+  <div class="col-sm">
+<!--      <q-badge color="green" v-if="transfer === true" rounded class="q-mr-sm" />    -->
+    <div class="q-gutter-md q-pa-md" style="max-width: 320px; font-size: 11px; margin-left: 0px;">
     <q-tooltip anchor="bottom middle" self="bottom middle">
       <b>You can put a range of values between min&max ​​in seconds for the output of each subsequent transaction</b>
     </q-tooltip>
       <q-toggle v-model="usedelay" color="blue" label="Use Time Delay Between Transfers"/>
-    </div>
-       <div class="row" style="max-width: 300px; margin-left: 35px;" v-if="usedelay">
+       <div class="row" style="max-width: 300px; margin-left: 15px;" v-if="usedelay">
        <div class="col-sm" style="max-width: 150px;">
         <q-input standout="bg-teal text-white" stack-label v-model="mintimedelay" label="min time in seconds"/>
        </div>
@@ -247,14 +289,6 @@ export default {
       </div>
       </div>
     </div>
-  </div>  
-  <div class="col-sm" style="align-items: center; margin-left: 20px;">
-    <div class="q-gutter-md q-pa-md" style="max-width: 350px; font-size: 12px;">
-      <li></li>
-    <ul><b>fullfill Configuration Params from API OKX</b></ul>
-      <q-input outlined v-model="apiKey" label="apiKey" />
-      <q-input outlined v-model="secretKey" label="secretKey" />
-      <q-input outlined v-model="passphrase" label="Passphrase" />
     </div>
   </div>
 </div>
@@ -407,8 +441,9 @@ export default {
 </q-card>
 </div>
 
-<div style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">
-    <q-btn flat label="Press to empty console screen" color="secondary" @click="resulttext = []" />
+<div style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: 0px;">
+    <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = []" />
+    <q-btn color="secondary" flat label="Get Min Withdraw Fee on selected chain" @click="OKXminfee()"/>
     <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 30%, #194f88 100%);">
       <ul><b>Console output</b></ul>
       <q-separator dark inset />

@@ -16,8 +16,8 @@
       <!-- menu content -->
       <q-list>
         <q-item-label header>
-          <div class="q-pa-md q-gutter-md" style="padding: 30px">
-            <q-badge color="blue">version1.2.3</q-badge>
+          <div class="q-pa-md q-gutter-md" style="padding: 30px; width: 300px">
+            <q-badge color="blue">v. {{ version }}</q-badge>
           </div>
         </q-item-label>
         <q-item
@@ -30,20 +30,35 @@
          <q-item-section avatar>
             <div style="font-size: 10px; text-align: center;"><img alt="okx" width="40" height="40" src="./assets/okx.png"></div>   
          </q-item-section>
-          <span style="padding: 10px"><b>OKX Withdraw</b></span>
+          <span style="padding: 10px"><b>OKX Withdraw Assets</b></span>
         </q-item>
         <q-separator spaced />
         <q-item
          clickable
+         disable
          v-ripple
          :active="link === 'Bitgetview'"
          @click="link = 'Bitgetview'"
          active-class="menu-link"
          to="/Bitgetview">
          <q-item-section avatar>
-           <div style="font-size: 10px; text-align: center;"><img alt="bybit" width="40" height="40" src="./assets/bitget.png"></div>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="./assets/bitget.png"></div>
          </q-item-section>
-          <span style="padding: 10px"><b>Bitget Withdraw</b></span>
+          <span style="padding: 10px"><b>Bitget Withdraw Assets</b></span>
+        </q-item>
+        <q-separator spaced />
+        <q-item
+         clickable
+         disable
+         v-ripple
+         :active="link === 'PointsChecker'"
+         @click="link = 'PointsChecker'"
+         active-class="menu-link"
+         to="/PointsChecker">
+         <q-item-section avatar>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="./assets/meteora.png"></div>
+         </q-item-section>
+          <span style="padding: 10px"><b>Meteora PointsChecker</b></span>
         </q-item>
       </q-list>
    </q-drawer>
@@ -60,8 +75,8 @@
 <template id="OKXview">
   <OKXview/>
 </template>
-<template id="Bybitview">
-  <Bybitview/>
+<template id="Bitgetview">
+  <Bitgetview/>
 </template>
 </q-page-container>
 </q-layout>
@@ -70,11 +85,12 @@
 <script>
 import Header from './components/Header.vue';
 import OKXview from './components/OKXview.vue';
-import Bybitview from './components/Bitget.vue';
+import Bitgetview from './components/Bitget.vue';
 import { ref } from 'vue';
+import packageInfo from '../package.json';
 //import router from 'vue-router';
 const leftMenu = ref(true);
-
+const version = packageInfo.version;
 //const okxview = {  name: "okxview ",  template: "#okxview"};
 //const bybitview = {  name: "bybitview",  template: "#bybitview"};
 //  const routes = [
@@ -87,12 +103,13 @@ export default {
   components: {
     Header,
     OKXview,
-    Bybitview,
+    Bitgetview
   },
   setup ()
   {
   return{
   leftMenu,
+  version,
   toggleleftMenu () {leftMenu.value = !leftMenu.value}
   }
 },
