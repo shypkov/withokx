@@ -5,10 +5,10 @@
     <q-toolbar>
       <q-btn dense flat round icon="menu" @click="toggleleftMenu" />
           <q-avatar>
-            <img src="./assets/monk.svg">
+            <img src='@/assets/monk.svg'>
           </q-avatar>
-          <span style="font-size: 10px; text-align: center; width: auto; color: khaki">© Cryptopitek</span>
-      <Header/>
+          <span style="font-size: 10.5px; text-align: center; width: auto; color: khaki">© Cryptopitek</span>
+      <Header />
     </q-toolbar>
   </q-header>
   <q-drawer show-if-above v-model="leftMenu" side="left" bordered class="bg-grey-2">
@@ -28,7 +28,7 @@
          active-class="menu-link"
          to="/OKXview">
          <q-item-section avatar>
-            <div style="font-size: 10px; text-align: center;"><img alt="okx" width="40" height="40" src="./assets/okx.png"></div>   
+            <div style="font-size: 10px; text-align: center;"><img alt="okx" width="40" height="40" src="@/assets/okx.png"></div>   
          </q-item-section>
           <span style="padding: 10px"><b>OKX Withdraw Assets</b></span>
         </q-item>
@@ -37,26 +37,25 @@
          clickable
          disable
          v-ripple
-         :active="link === 'Bitgetview'"
-         @click="link = 'Bitgetview'"
+         :active="link === 'Bitget'"
+         @click="link = 'Bitget'"
          active-class="menu-link"
-         to="/Bitgetview">
+         to="/Bitget">
          <q-item-section avatar>
-           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="./assets/bitget.png"></div>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/bitget.png"></div>
          </q-item-section>
           <span style="padding: 10px"><b>Bitget Withdraw Assets</b></span>
         </q-item>
         <q-separator spaced />
         <q-item
          clickable
-         disable
          v-ripple
          :active="link === 'PointsChecker'"
          @click="link = 'PointsChecker'"
          active-class="menu-link"
-         to="/PointsChecker">
+         to="/Meteora">
          <q-item-section avatar>
-           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="./assets/meteora.png"></div>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/meteora.png"></div>
          </q-item-section>
           <span style="padding: 10px"><b>Meteora PointsChecker</b></span>
         </q-item>
@@ -67,43 +66,26 @@
 <span>
 <ul>
 <b>
-
 </b>
 </ul>
 </span>
-<OKXview/>
-<template id="OKXview">
-  <OKXview/>
-</template>
-<template id="Bitgetview">
-  <Bitgetview/>
-</template>
+<router-view />
 </q-page-container>
 </q-layout>
 </template>
 
 <script>
 import Header from './components/Header.vue';
-import OKXview from './components/OKXview.vue';
-import Bitgetview from './components/Bitget.vue';
 import { ref } from 'vue';
 import packageInfo from '../package.json';
-//import router from 'vue-router';
 const leftMenu = ref(true);
 const version = packageInfo.version;
-//const okxview = {  name: "okxview ",  template: "#okxview"};
-//const bybitview = {  name: "bybitview",  template: "#bybitview"};
-//  const routes = [
-//  { path: "/OKXview", component: okxview},
-//{ path: "/Bybitview", component: bybitview}];
-//const router = new VueRouter({  routes}); 
+
 
 export default {
   name: 'App',
   components: {
     Header,
-    OKXview,
-    Bitgetview
   },
   setup ()
   {
