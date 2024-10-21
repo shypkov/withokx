@@ -5,7 +5,7 @@
 import axios from 'axios'
 //import crypto from 'cryptoJS'
 import { useLocalStorage } from '@vueuse/core'
-import { Axios } from 'axios'
+//import { Axios } from 'axios'
 import CryptoJS from 'crypto-js'
 import { ref } from 'vue'
 
@@ -13,11 +13,11 @@ const apiKey = useLocalStorage('apikey', '');
 const passphrase = useLocalStorage('pass', '');
 const secretKey = useLocalStorage('secret', '');
 const fee = ref();
-const adress1 = useLocalStorage('wallet1', '');
-const adress2 = useLocalStorage('wallet2', '');
-const adress3 = useLocalStorage('wallet3', '');
-const adress4 = useLocalStorage('wallet4', '');
-const adress5 = useLocalStorage('wallet5', '');
+const adress1 = useLocalStorage('address1', '');
+const adress2 = useLocalStorage('address2', '');
+const adress3 = useLocalStorage('address3', '');
+const adress4 = useLocalStorage('address4', '');
+const adress5 = useLocalStorage('address5', '');
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
@@ -32,7 +32,6 @@ const usedelay = ref(false);
 const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
 const baseUrl = ref('https://www.okx.com');
 
-
 async function OKXminfee() {
   try {
 const timestamp = new Date().toISOString().split('.')[0] + "Z";
@@ -40,9 +39,6 @@ const method = 'GET';
 const getUrl = '/api/v5/asset/currencies?ccy='+ccy.value;
 const body = '';
 const getSig = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + getUrl + body, secretKey.value));
-//axios.get(getUrl)
-//.then(response => {console.log(response.data)})
-//.catch(err => {console.error(err)});
 const response = await axios.get(baseUrl.value + getUrl, {
     method: method,
     url: getUrl,
@@ -54,16 +50,16 @@ const response = await axios.get(baseUrl.value + getUrl, {
         'OK-ACCESS-PASSPHRASE': passphrase.value
     }
 });
-const parsedResponse = response.data;
-const responseError = parsedResponse.msg;
-  
-if (responseError && responseError.length > 0) {
-    throw new Error(`Error : ${responseError}`);}
-
-const minFee = parsedResponse.data[0].minFee;
-const chain = parsedResponse.data[0].chain;
-resulttext.value = [...resulttext.value, minFee, chain];
-//console.log(`minimum fee: ${minFee}`);
+const FullResponse = response.data;
+//const responseError = FullResponse.msg;
+//const FullResponse = ${JSON.stringify(response.data)};
+const parsedResponse = `${new Date().toString()} - 'min withdraw fee' ${FullResponse.data[0].minFee} 'for chain' ${FullResponse.data[0].chain}`;
+resulttext.value = [...resulttext.value, parsedResponse];
+//const minFee = FullResponse.data[0].minFee;
+//const chain = FullResponse.data[0].chain;
+//const ccy = FullResponse.data[0].ccy;
+//resulttext.value = [...resulttext.value, FullResponse];
+//if (responseError && responseError.length > 0) {throw new Error(`Error : ${responseError}`);}
 console.log(response.data);
 }
 catch (error)
@@ -123,13 +119,15 @@ const responseError = parsedResponse.msg;
 
 const wdId = parsedResponse.data[0].wdId;
 console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-result = (new Date().toString() `Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
+result = (`${new Date().toString()} Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
+if (usedelay) {
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
 console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 result = (`Delaying next withdrawal for ${delay / 1000} seconds...`);
 resulttext.value = [...resulttext.value, result];
 await new Promise(resolve => setTimeout(resolve, delay));
+}
 console.log("")
 }
 
@@ -155,7 +153,6 @@ progress.value=false;
 
 export default {
   setup () {
-//  const $q = useQuasar()
   return {
       adress1,
       adress2,
@@ -316,7 +313,7 @@ export default {
         {label: 'BTC', value: 'BTC'},
         {label: 'BNB', value: 'BNB'},
         {label: 'APT', value: 'APT'},
-        {label: 'MATIC', value: 'MATIC'},
+        {label: 'Polygon', value: 'POL'},
         {label: 'AVAX', value: 'AVAX'},
         {label: 'TON', value: 'TON'},
         {label: 'SOL', value: 'SOL'},
@@ -391,14 +388,14 @@ export default {
       :options="[
         {label: 'APTOS', value: 'APT-Aptos'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'MATIC'"
+    <q-btn-toggle v-if="ccy === 'POL'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="green"
       :options="[
-        {label: 'MATIC', value: 'MATIC-Polygon'}
+        {label: 'POL', value: 'POL-Polygon'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'AVAX'"
       size="md"
@@ -447,7 +444,7 @@ export default {
     <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 30%, #194f88 100%);">
       <ul><b>Console output</b></ul>
       <q-separator dark inset />
-      <q-scroll-area style="height: 250px; max-width: 300px;">
+      <q-scroll-area style="height: 250px; max-width: 500px;">
       <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         <q-separator dark inset />
         {{ item }}
