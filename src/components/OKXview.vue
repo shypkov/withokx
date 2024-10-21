@@ -4,8 +4,8 @@
 //import { enc, HmacSHA256 } from 'crypto-js'
 import axios from 'axios'
 //import crypto from 'cryptoJS'
+import { Axios } from 'axios'
 import { useLocalStorage } from '@vueuse/core'
-//import { Axios } from 'axios'
 import CryptoJS from 'crypto-js'
 import { ref } from 'vue'
 
@@ -53,7 +53,7 @@ const response = await axios.get(baseUrl.value + getUrl, {
 const FullResponse = response.data;
 //const responseError = FullResponse.msg;
 //const FullResponse = ${JSON.stringify(response.data)};
-const parsedResponse = `${new Date().toString()} - 'min withdraw fee' ${FullResponse.data[0].minFee} 'for chain' ${FullResponse.data[0].chain}`;
+const parsedResponse = `${new Date().toString()} - 'min withdraw fee' ${FullResponse.data[0].minFee} 'min withdraw value' ${FullResponse.data[0].minWd} 'for chain' ${FullResponse.data[0].chain}`;
 resulttext.value = [...resulttext.value, parsedResponse];
 //const minFee = FullResponse.data[0].minFee;
 //const chain = FullResponse.data[0].chain;
