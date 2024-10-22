@@ -53,7 +53,7 @@ const response = await axios.get(baseUrl.value + getUrl, {
 const FullResponse = response.data;
 //const responseError = FullResponse.msg;
 //const FullResponse = ${JSON.stringify(response.data)};
-const parsedResponse = `${new Date().toString()} - 'min withdraw fee' ${FullResponse.data[0].minFee} 'min withdraw value' ${FullResponse.data[0].minWd} 'for chain' ${FullResponse.data[0].chain}`;
+const parsedResponse = `${new Date().toString()} - 'min withdraw fee = ' ${FullResponse.data[0].minFee} '& min withdraw value = ' ${FullResponse.data[0].minWd} 'for chain' ${FullResponse.data[0].chain}`;
 resulttext.value = [...resulttext.value, parsedResponse];
 //const minFee = FullResponse.data[0].minFee;
 //const chain = FullResponse.data[0].chain;
@@ -118,16 +118,15 @@ const responseError = parsedResponse.msg;
   }
 
 const wdId = parsedResponse.data[0].wdId;
-console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
+//console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
 result = (`${new Date().toString()} Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
-if (usedelay) {
+if (usedelay.value === true) {
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
-console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 result = (`Delaying next withdrawal for ${delay / 1000} seconds...`);
 resulttext.value = [...resulttext.value, result];
 await new Promise(resolve => setTimeout(resolve, delay));
-}
+} else {console.log('usedelay is false, skipping delay.');}
 console.log("")
 }
 
