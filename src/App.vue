@@ -20,9 +20,7 @@
             <q-badge color="blue">v. {{ version }}</q-badge>
           </div>
         </q-item-label>
-        <q-item
-         clickable
-         v-ripple
+        <q-item clickable
          :active="link === 'OKXview'"
          @click="link = 'OKXview'"
          active-class="menu-link"
@@ -33,10 +31,8 @@
           <span style="padding: 10px"><b>OKX Withdraw Assets</b></span>
         </q-item>
         <q-separator spaced />
-        <q-item
-         clickable
+        <q-item clickable
          disable
-         v-ripple
          :active="link === 'Bitget'"
          @click="link = 'Bitget'"
          active-class="menu-link"
@@ -47,9 +43,7 @@
           <span style="padding: 10px"><b>Bitget Withdraw Assets</b></span>
         </q-item>
         <q-separator spaced />
-        <q-item
-         clickable
-         v-ripple
+        <q-item clickable
          :active="link === 'PointsChecker'"
          @click="link = 'PointsChecker'"
          active-class="menu-link"

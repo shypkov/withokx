@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import OKXview from '../components/OKXview.vue';
 import Bitget from '../components/Bitget.vue';
 import Meteora from '../components/Meteora.vue';
@@ -11,7 +11,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 });
 

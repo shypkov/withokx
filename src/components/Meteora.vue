@@ -26,13 +26,10 @@ const wallets = [wallet1.value, wallet2.value, wallet3.value, wallet4.value, wal
 
 async function GetMeteora() {
   try {
-    // Iterate over wallets and fetch data for each
     for (const wallet of wallets) {
-      if (wallet) { // Only fetch if the wallet is not empty
+      if (wallet) {
         const response = await axios.get(`${apiUrl.value}${wallet}`);
         console.log(response.data);
-
-        // Format the result and append it to resulttext.value
         const parsedResponse = `'Meteora points' ${new Date().toString()} - 'wallet address' ${wallet} - ${JSON.stringify(response.data)}`;
         resulttext.value = [...resulttext.value, parsedResponse];
       }

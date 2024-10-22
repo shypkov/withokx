@@ -1,7 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig(
   {
-  publicPath: '/withokx/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/withokx/' : '/',
   transpileDependencies: ['quasar'],
   pluginOptions: { 
     quasar: {
