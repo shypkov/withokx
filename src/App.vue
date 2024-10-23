@@ -1,22 +1,22 @@
 <template>
-<q-layout view="hhh LpR fff" class="bg-white">
+<q-layout view="hhh LpR fff" class="bg-white" style="min-height: 1100px">
   <!--  <q-header :class="!$q.dark.isActive ? 'bg-white text-dark' : null" class="main"></q-header></div>-->
   <q-header elevated class="bg-primary text-white">
     <q-toolbar>
-      <q-btn dense flat round icon="menu" @click="toggleleftMenu" />
-          <q-avatar>
+      <q-btn flat icon='menu' @click="toggleleftMenu" />
+        <q-avatar>
             <img src='@/assets/monk.svg'>
           </q-avatar>
-          <span style="font-size: 10.5px; text-align: center; width: auto; color: khaki">© Cryptopitek</span>
+          <span style="font-size: 10px; text-align: left; width: 50px; color: khaki">©Cryptopitek</span>
       <Header />
     </q-toolbar>
   </q-header>
-  <q-drawer show-if-above v-model="leftMenu" side="left" bordered class="bg-grey-2">
 
+  <q-drawer show-if-above v-model="leftMenu" side="left" bordered class="bg-grey-2">
       <!-- menu content -->
       <q-list>
         <q-item-label header>
-          <div class="q-pa-md q-gutter-md" style="padding: 30px; width: 300px">
+          <div class="q-pa-md q-gutter-md" style="padding: 30px; width: 290px">
             <q-badge color="blue">v. {{ version }}</q-badge>
           </div>
         </q-item-label>
@@ -54,7 +54,8 @@
           <span style="padding: 10px"><b>Meteora PointsChecker</b></span>
         </q-item>
       </q-list>
-   </q-drawer>
+    </q-drawer>
+
 
 <q-page-container>
 <span>

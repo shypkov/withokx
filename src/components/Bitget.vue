@@ -4,8 +4,8 @@
 //import { enc, HmacSHA256 } from 'crypto-js'
 import axios from 'axios'
 //import crypto from 'cryptoJS'
-import { useLocalStorage } from '@vueuse/core'
 import { Axios } from 'axios'
+import { useLocalStorage } from '@vueuse/core'
 import CryptoJS from 'crypto-js'
 import { ref } from 'vue'
 
@@ -13,11 +13,11 @@ const apiKey = useLocalStorage('apikey', '');
 const passphrase = useLocalStorage('pass', '');
 const secretKey = useLocalStorage('secret', '');
 const fee = ref();
-const adress1 = useLocalStorage('wallet1', '');
-const adress2 = useLocalStorage('wallet2', '');
-const adress3 = useLocalStorage('wallet3', '');
-const adress4 = useLocalStorage('wallet4', '');
-const adress5 = useLocalStorage('wallet5', '');
+const adress1 = useLocalStorage('address1', '');
+const adress2 = useLocalStorage('address2', '');
+const adress3 = useLocalStorage('address3', '');
+const adress4 = useLocalStorage('address4', '');
+const adress5 = useLocalStorage('address5', '');
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
@@ -25,13 +25,13 @@ const maxtimedelay = ref();
 const networks = ref('ETH-ERC20');
 const ccy = ref('ETH');
 const resulttext = ref([]);
+const resulttextget = ref([]);
 let result = ref();
 let howto = ref(false);
 const progress = ref(false);
 const usedelay = ref(false);
 const apiUrl = ref('https://www.okx.cab/api/v5/asset/withdrawal');
 const baseUrl = ref('https://www.okx.com');
-
 
 async function OKXminfee() {
   try {
@@ -40,9 +40,6 @@ const method = 'GET';
 const getUrl = '/api/v5/asset/currencies?ccy='+ccy.value;
 const body = '';
 const getSig = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + getUrl + body, secretKey.value));
-//axios.get(getUrl)
-//.then(response => {console.log(response.data)})
-//.catch(err => {console.error(err)});
 const response = await axios.get(baseUrl.value + getUrl, {
     method: method,
     url: getUrl,
@@ -54,16 +51,16 @@ const response = await axios.get(baseUrl.value + getUrl, {
         'OK-ACCESS-PASSPHRASE': passphrase.value
     }
 });
-const parsedResponse = response.data;
-const responseError = parsedResponse.msg;
-  
-if (responseError && responseError.length > 0) {
-    throw new Error(`Error : ${responseError}`);}
-
-const minFee = parsedResponse.data[0].minFee;
-const chain = parsedResponse.data[0].chain;
-resulttext.value = [...resulttext.value, minFee, chain];
-//console.log(`minimum fee: ${minFee}`);
+const FullResponse = response.data;
+//const responseError = FullResponse.msg;
+//const FullResponse = ${JSON.stringify(response.data)};
+const parsedResponse = `${new Date().toString()} - 'min withdraw fee = ' ${FullResponse.data[0].minFee} '& min withdraw value = ' ${FullResponse.data[0].minWd} 'for chain' ${FullResponse.data[0].chain} 'ccy' ${FullResponse.data[0].ccy}`;
+resulttextget.value = [...resulttextget.value, parsedResponse];
+//const minFee = FullResponse.data[0].minFee;
+//const chain = FullResponse.data[0].chain;
+//const ccy = FullResponse.data[0].ccy;
+//resulttext.value = [...resulttext.value, FullResponse];
+//if (responseError && responseError.length > 0) {throw new Error(`Error : ${responseError}`);}
 console.log(response.data);
 }
 catch (error)
@@ -122,14 +119,15 @@ const responseError = parsedResponse.msg;
   }
 
 const wdId = parsedResponse.data[0].wdId;
-console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
-result = (new Date().toString() `Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
+//console.log('\x1b[32m%s\x1b[0m', `Withdrawal successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX transaction ID: ${wdId}`);
+result = (`${new Date().toString()} Successful!, Withdrawn ${withdrawalParams.amt} ${withdrawalParams.ccy} to ${withdrawalParams.toAddr} on chain ${withdrawalParams.chain} OKX TXID: ${wdId}`);
 resulttext.value = [...resulttext.value, result];
+if (usedelay.value === true) {
 const delay = getRandomNumber(Number(mintimedelay.value), Number(maxtimedelay.value), 50) * 1000;
-console.log('\x1b[36m%s\x1b[0m', `Delaying next withdrawal for ${delay / 1000} seconds...`);
 result = (`Delaying next withdrawal for ${delay / 1000} seconds...`);
 resulttext.value = [...resulttext.value, result];
 await new Promise(resolve => setTimeout(resolve, delay));
+} else {console.log('usedelay is false, skipping delay.');}
 console.log("")
 }
 
@@ -155,7 +153,6 @@ progress.value=false;
 
 export default {
   setup () {
-//  const $q = useQuasar()
   return {
       adress1,
       adress2,
@@ -174,6 +171,7 @@ export default {
       networks,
       ccy,
       resulttext,
+      resulttextget,
       result,
       howto,
       progress,
@@ -207,11 +205,8 @@ export default {
 <div class="container">
   <div class="row" style="width: 1200px; margin-left: 20px;">
   <q-card>
-    
     <div class="row" style="width: 1180px; margin-left: 20px;">
-
     <div class="col-sm" style="max-width: 400px; margin-left: auto;">
-
     <div class="q-gutter-md q-pa-md" style="font-size: 11px;">
     <ul><b>Fill the address carefully and successively. This form is not validating inputs</b></ul>
     <q-input standout="bg-teal text-white" stack-label v-model="adress1" label="Address1"/>
@@ -220,47 +215,50 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="adress4" label="Address4"/>
     <q-input standout="bg-teal text-white" stack-label v-model="adress5" label="Address5"/>
     </div>
-
 <!--    <q-btn fab icon="add" color="grey" />-->
   </div>
   <div class="col-sm" style="max-width: 350px; margin-left: 20px; align-items: left; ">
     <li>
     <ul><b>You can set a range of values between min and max to randomize withdraw value</b></ul>
   </li>
-    <div class="q-gutter-md" style="width: 250px; margin-left: 60px;">
+    <div class="q-gutter-md" style="width: 240px; margin-left: 60px;">
       <q-input outlined v-model="minWithdrawal" placeholder="0.0075" label="minWithdrawal value" />
       <q-input outlined v-model="maxWithdrawal" placeholder="0.02" label="maxWithdrawal value" />
       <q-input outlined v-model="fee" placeholder="0.0001" label="fee" />
     </div>
-    <ul>Press Transfer Button to complete transfer</ul>
-      <q-btn v-model="progress" :disabled="progress" color="primary" label="Transfer" @click="withdrawToAddresses()" /> 
+    <ul>Press Withdraw Button to complete transfer</ul>
+    <div style="max-width: 240px; margin-left: 70px; align-items: center; ">
+      <q-btn v-model="progress" :disabled="progress" color="primary" label="Withdraw" @click="withdrawToAddresses()" /> 
       <div v-if="progress">
         <q-spinner-box color="primary" size="3em" /> 
         <q-tooltip :offset="[0, 8]">Running</q-tooltip>
       </div>
       <div class="q-pa-md q-gutter-sm">
-      <q-btn label="How to use" color="red" @click="howto = true" />
+      <q-btn label="FAQ: How to use" color="red" @click="howto = true" />
       <q-dialog v-model="howto">
       <q-card>
         <q-card-section>
-          <div class="text-h8">HOW TO USE</div>
+          <div class="text-h8">FAQ: HOW TO USE</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <p>Here goes the mini-instruction to use this page:</p>
-          <p>- !!!Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form </p>
-          <p>- !!!WHITELIST all the adresses on exchange management page on which you wish to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>          
-          <p>- !PLEASE DO NOT RELOAD or CLOSE THIS Page when TRANSFER is Running. If you do - the process will be terminated</p>
-          <p>- Fill the fields above with values, optionally you can enable random time delay between transfers on adresses and just click TRANSFER button... watch result in log miniscreen</p>
-          <p>- If you see CORS error!!!Install the browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
-          <p>- if you see Network error message press F12 in your browser and select console: if you see "net::ERR_NAME_NOT_RESOLVED" you need to select another CONNECTION from the dropdown button</p>
-          <p>- Please! Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
-          <p>- Check actual MinWithdrawal and Fee params for each network: open new tab <a href=http://91.107.163.79:3000>use fee agregator site to check actual lowest withdrawal fees</a> </p>
+          <p>Disclaimer: This App doesn't store any secrets or other keys in cloud\external storages. Clearing the browser\page cache will drop all the stored secrets and other data from input fields</p>
+          <p>- INFO: This app layout is not adapted for mobile browsers, but still can be used on mobile browsers</p>
+          <p>- INFO: Get "Min withdraw Fee" works only if ApiKey, SecretKey and Passphrase are set correctly</p>
+          <p>- Action: Go to <a href='https://www.okx.com/ru/account/my-api'>OKX API management and Create API key</a>. Check the box next to the Enable Withdrawals. You shoud receive in result SecretKey and API key + passphrase for this keys and you need to fill the proper fields in form</p>
+          <p>- Action: !WHITELIST all the adresses on exchange management page on which you wish to accept withdrawals. Notice that you need to whitelist adresses depending on networks</p>
+          <p>- Action: Fill the fields above with values, optionally you can enable random time delay between transfers on addresses and just click Withdraw button... watch result in console log</p>
+          <p>- WARNING: Please DO NOT RELOAD or CLOSE THIS Page when WITHDRAW is Running. If you do - the process will be terminated</p>
+          <p>- WARNING: Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
+          <p>- Debug: If you see CORS error in console then install browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
+          <p>- Debug: if you see Network error message with "net::ERR_NAME_NOT_RESOLVED" then select another CONNECTION url from the dropdown button CONNECTION</p>
+          <p>- ADVICE: if you still have issues with the app or need a neccessary function, contact the dev: <a href='https://t.me/cryptopitek'>cryptopitek</a></p>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="I got it" color="red" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
+  </div>
   </div>
   </div>  
 
@@ -298,11 +296,12 @@ export default {
   <q-space />
 </div>
 
-<div class="row" style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">
-  <q-card>
-<span class="q-gutter-sm"><b>Select Chain & Asset to withdraw</b></span>
-<div class="col-sm" style="width: 800px; margin-left: 400px;">
-<div class="q-gutter-md sm-buttons" >
+
+<div class="row" style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: auto;">  
+<q-card>
+  <span class="q-gutter-sm"><b>Select Chain & Asset to withdraw</b></span>
+   <div class="row" >
+   <div class="col-sm q-pa-sm" style="width: 1200px; display: flex; justify-content: center;">
     <q-btn-toggle
       size="md"
       v-model="ccy"
@@ -316,16 +315,19 @@ export default {
         {label: 'BTC', value: 'BTC'},
         {label: 'BNB', value: 'BNB'},
         {label: 'APT', value: 'APT'},
-        {label: 'MATIC', value: 'MATIC'},
+        {label: 'Polygon', value: 'POL'},
         {label: 'AVAX', value: 'AVAX'},
         {label: 'TON', value: 'TON'},
         {label: 'SOL', value: 'SOL'},
         {label: 'ZETA', value: 'ZETA'}
         ]"/>
-</div>
-<div class="q-pa-sm q-gutter-sm" style="font-size: 10px">
+    </div>
+    </div>
+<div class="row" >
+<div class="col-sm q-pa-sm" style="width: 1200px; display: flex; justify-content: center;">
+  <div style="display: flex; justify-content: center; width: 1200px;">
     <q-btn-toggle v-if="ccy === 'ETH'"
-      size="sm"
+      size="md"
       v-model="networks"
       push
       glossy
@@ -338,7 +340,7 @@ export default {
         {label: 'XLayer', value: 'ETH-X Layer'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDT'"
-      size="sm"
+      size="md"
       v-model="networks"
       push
       glossy
@@ -352,7 +354,7 @@ export default {
         {label: 'Arbi', value: 'USDT-Arbitrum One'}        
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDC'"
-      size="sm"  
+      size="md"  
       v-model="networks"
       push
       glossy
@@ -391,14 +393,14 @@ export default {
       :options="[
         {label: 'APTOS', value: 'APT-Aptos'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'MATIC'"
+    <q-btn-toggle v-if="ccy === 'POL'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="green"
       :options="[
-        {label: 'MATIC', value: 'MATIC-Polygon'}
+        {label: 'POL', value: 'POL-Polygon'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'AVAX'"
       size="md"
@@ -435,27 +437,42 @@ export default {
       toggle-color="blue"
       :options="[
         {label: 'ZETA', value: 'ZETA-ZetaChain'}
-        ]"/>      
-</div>
-</div>
+        ]"/>     
+    </div> 
+  </div>
+ </div>
 </q-card>
 </div>
 
-<div style="width: 1200px; margin-left: 20px; font-size: 10px; max-height: 0px;">
+<div style="width: 1200px; margin-left: 20px; font-size: 10px; height: 300px;">
+<div class="row" style="padding-left: 360px; ">
     <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = []" />
     <q-btn color="secondary" flat label="Get Min Withdraw Fee on selected chain" @click="OKXminfee()"/>
+</div>    
     <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 30%, #194f88 100%);">
       <ul><b>Console output</b></ul>
       <q-separator dark inset />
-      <q-scroll-area style="height: 250px; max-width: 300px;">
-      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
+  <div class="row">
+    <div class="col-sm">
+    <q-scroll-area style="height: 300px; max-width: 550px;">
+     <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         <q-separator dark inset />
         {{ item }}
         <q-separator dark inset />
       </q-card-section>
     </q-scroll-area>
+    </div>
+    <div class="col-sm">
+    <q-scroll-area style="height: 300px; max-width: 550px;">
+      <q-card-section class="q-pt-none" v-for="item in resulttextget" :key="item">
+        <q-separator dark inset />
+        {{ item }}
+        <q-separator dark inset />
+      </q-card-section>
+    </q-scroll-area>
+    </div>
+  </div>
     </q-card>
-
   </div>
 </div>
 </template>
@@ -482,8 +499,8 @@ a {
   color: #42b983;
 }
 
-.sm-buttons 
-
+.sm-buttons
+  
   .q-btn 
   { 
     width: 55px;
@@ -491,19 +508,18 @@ a {
 
   .q-btn-group 
   {
-    box-shadow: none;
-    padding-left: 40px;
-    width: 450px;
+    box-shadow: 1px;
+    width: auto;
     display: flex;
-    flex-wrap: wrap;  
+    flex-wrap: wrap;
   }
 
   .q-btn-toggle  
   {
-    padding-left: 40px;
-    width: 450px;
+    box-shadow: 1px;
+    padding-left: none;
+    max-width: auto;
     display: flex;
     flex-wrap: wrap;    
   }
- 
 </style>
