@@ -53,6 +53,17 @@
          </q-item-section>
           <span style="padding: 10px"><b>Meteora PointsChecker</b></span>
         </q-item>
+        <q-separator spaced />
+        <q-item clickable
+         :active="link === 'AmbientChecker'"
+         @click="link = 'AmbientChecker'"
+         active-class="menu-link"
+         to="/Ambient">
+         <q-item-section avatar>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/ambient.png"></div>
+         </q-item-section>
+          <span style="padding: 10px"><b>Ambient PointsChecker</b></span>
+        </q-item>
       </q-list>
     </q-drawer>
 
