@@ -64,6 +64,18 @@
          </q-item-section>
           <span style="padding: 10px"><b>Ambient PointsChecker</b></span>
         </q-item>
+        <q-separator spaced />
+        <q-item clickable
+         :active="link === 'KarakChecker'"
+         @click="link = 'KarakChecker'"
+         active-class="menu-link"
+         to="/Karak">
+         <q-item-section avatar>
+           <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/karak.png"></div>
+         </q-item-section>
+          <span style="padding: 10px"><b>Karak PointsChecker</b></span>
+        </q-item>
+
       </q-list>
     </q-drawer>
 
