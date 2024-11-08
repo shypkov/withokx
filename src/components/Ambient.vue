@@ -19,17 +19,28 @@ const wallet12 = useLocalStorage('amb12', '');
 const wallet13 = useLocalStorage('amb13', '');
 const wallet14 = useLocalStorage('amb14', '');
 const wallet15 = useLocalStorage('amb15', '');
+const wallet16 = useLocalStorage('amb16', '');
+const wallet17 = useLocalStorage('amb17', '');
+const wallet18 = useLocalStorage('amb18', '');
+const wallet19 = useLocalStorage('amb19', '');
+const wallet20 = useLocalStorage('amb20', '');
+const wallet21 = useLocalStorage('amb21', '');
+const wallet22 = useLocalStorage('amb22', '');
+const wallet23 = useLocalStorage('amb23', '');
+const wallet24 = useLocalStorage('amb24', '');
 const resulttext = ref([]);
+const resulttextsec = ref([]);
 let result = ref();
 const apiUrl = ref('https://ambindexer.net/xp/user?user=');
-const wallets = [wallet1.value, wallet2.value, wallet3.value, wallet4.value, wallet5.value, wallet6.value, wallet7.value, wallet8.value, wallet9.value, wallet10.value, wallet11.value, wallet12.value, wallet13.value, wallet14.value, wallet15.value];
+const satUrl = ref('https://api.fuul.xyz/api/v1/payouts/leaderboard?project_id=satlayer&user_address=');
+const wallets = [wallet1.value, wallet2.value, wallet3.value, wallet4.value, wallet5.value, wallet6.value, wallet7.value, wallet8.value, wallet9.value, wallet10.value, wallet11.value, wallet12.value, wallet13.value, wallet14.value, wallet15.value, wallet16.value, wallet17.value, wallet18.value, wallet19.value, wallet20.value, wallet21.value, wallet22.value, wallet23.value, wallet24.value];
 
 async function GetAmbient() {
   try {
     for (const wallet of wallets) {
       if (wallet) {
         const response = await axios.get(`${apiUrl.value}${wallet}&chainId=0x82750`);
-        console.log(response.data.data);
+//        console.log(response.data.data);
         const globalpoints = response.data.data.globalPoints;
         const globalrank = response.data.data.globalRank;
         const weeklypoints = response.data.data.weeklyPoints;
@@ -38,7 +49,29 @@ async function GetAmbient() {
       }
     }
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    const parsedError = `${new Date().toString()}, ${error.message}`;
+    resulttext.value = [...resulttext.value, parsedError];
+  }
+};
+
+async function GetSatlayer() {
+  try {
+    for (const wallet of wallets) {
+      if (wallet) {
+        const response = await axios.get(`${satUrl.value}${wallet}`, {
+          headers: {
+            Authorization: `Bearer c3ed71d251fde296f2b3f477b3164af6b1f55a961f29439584f3485781fc8f61`
+          }});
+//        console.log(response.data.results);
+        const points = response.data.results[0].total_amount;
+        const rank = response.data.results[0].rank;
+        const parsedResponse = `'Satlayer points' ${new Date().toString()} - 'Wallet Address' ${wallet} 'SatLayerPoints' ${points} 'Rank' ${rank}`;
+        resulttextsec.value = [...resulttextsec.value, parsedResponse];
+      }
+    }
+  } catch (error) {
+    const parsedError = `${new Date().toString()}, ${error.message}`;
+    resulttextsec.value = [...resulttextsec.value, parsedError];
   }
 };
 
@@ -60,11 +93,23 @@ export default {
       wallet13,
       wallet14,
       wallet15,
+      wallet16,
+      wallet17,
+      wallet18,
+      wallet19,
+      wallet20,
+      wallet21,
+      wallet22,
+      wallet23,
+      wallet24,
       wallets,
       resulttext,
+      resulttextsec,
       result,
       apiUrl,
-      GetAmbient
+      satUrl,
+      GetAmbient,
+      GetSatlayer
     } 
 }
 }
@@ -86,28 +131,37 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="wallet3" label="Address3"/> 
     <q-input standout="bg-teal text-white" stack-label v-model="wallet4" label="Address4"/>
     <q-input standout="bg-teal text-white" stack-label v-model="wallet5" label="Address5"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet6" label="Address6"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet7" label="Address7"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet8" label="Address8"/> 
     </div>
 <!--    <q-btn fab icon="add" color="grey" />-->
     </div>
     <div class="col-sm" style="max-width: 400px;">
     <div class="q-gutter-md q-pa-md" style="width: 400px; font-size: 11px; padding: 15px;">
 <!--    <ul><b>Points checker by addresses</b></ul>-->
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet6" label="Address6"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet7" label="Address7"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet8" label="Address8"/> 
     <q-input standout="bg-teal text-white" stack-label v-model="wallet9" label="Address9"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet10" label="Address10"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet10" label="Address10"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet11" label="Address11"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet12" label="Address12"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet13" label="Address13"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet14" label="Address14"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet15" label="Address15"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet16" label="Address16"/>
     </div>
 <!--    <q-btn fab icon="add" color="grey" />-->
     </div>  
     <div class="col-sm" style="max-width: 400px;">
     <div class="q-gutter-md q-pa-md" style="max-width: 400px; font-size: 11px; padding: 15px;">
 <!--    <ul><b>Satlayer Points checker</b></ul>-->
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet11" label="Address11"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet12" label="Address12"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet13" label="Address13"/> 
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet14" label="Address14"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet15" label="Address15"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet17" label="Address17"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet18" label="Address18"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet19" label="Address19"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet20" label="Address20"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet21" label="Address21"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet22" label="Address22"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet23" label="Address23"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet24" label="Address24"/>
     </div>
   </div>
 </div>
@@ -124,11 +178,9 @@ export default {
   <div style="margin-left: 45px;">
   <q-btn color="secondary" label="Get Ambient Points for adresses" @click="GetAmbient()"/>
   </div>
-  <div style="margin-left: 130px;">
-    <q-btn disable color="info" label="Get EVM Points for adresses" @click="GetMeteora()"/>
-  </div>
-  <div style="margin-left: 130px;">
-    <q-btn disable color="warning" label="Get EVM2 Points for adresses" @click="GetMeteora()"/>
+
+  <div style="margin-left: 540px;">
+    <q-btn color="warning" label="Get Satlayer Points for adresses" @click="GetSatlayer()"/>
   </div> 
 </div>
 </q-card>
@@ -139,13 +191,26 @@ export default {
     <q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 30%, #194f88 100%);">
       <ul><b>Console output</b></ul>
       <q-separator dark inset />
-      <q-scroll-area style="height: 450px; max-width: 600px;">
-      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
+      <div class="row">
+    <div class="col-sm">
+    <q-scroll-area style="height: 400px; max-width: 550px;">
+     <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         <q-separator dark inset />
         {{ item }}
         <q-separator dark inset />
       </q-card-section>
     </q-scroll-area>
+    </div>
+    <div class="col-sm">
+    <q-scroll-area style="height: 400px; max-width: 550px;">
+      <q-card-section class="q-pt-none" v-for="item in resulttextsec" :key="item">
+        <q-separator dark inset />
+        {{ item }}
+        <q-separator dark inset />
+      </q-card-section>
+    </q-scroll-area>
+    </div>
+  </div>
     </q-card>
   </div>
 </div>

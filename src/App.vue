@@ -51,7 +51,7 @@
          <q-item-section avatar>
            <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/meteora.png"></div>
          </q-item-section>
-          <span style="padding: 10px"><b>Meteora PointsChecker</b></span>
+          <span style="padding: 10px"><b>Meteora Solayer pointsCheck</b></span>
         </q-item>
         <q-separator spaced />
         <q-item clickable
@@ -62,7 +62,7 @@
          <q-item-section avatar>
            <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/ambient.png"></div>
          </q-item-section>
-          <span style="padding: 10px"><b>Ambient PointsChecker</b></span>
+          <span style="padding: 10px"><b>Ambient Satlayer pointsCheck</b></span>
         </q-item>
         <q-separator spaced />
         <q-item clickable
@@ -73,7 +73,7 @@
          <q-item-section avatar>
            <div style="font-size: 10px; text-align: center;"><img alt="bitget" width="40" height="40" src="@/assets/karak.png"></div>
          </q-item-section>
-          <span style="padding: 10px"><b>Karak PointsChecker</b></span>
+          <span style="padding: 10px"><b>Karak Kinza pointsCheck</b></span>
         </q-item>
 
       </q-list>

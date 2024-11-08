@@ -445,7 +445,7 @@ export default {
 </q-card>
 </div>
 
-<div style="width: 1200px; margin-left: 20px; font-size: 10px; height: 300px;">
+<div style="width: 1200px; margin-left: 20px; font-size: 10px; height: 600px;">
 <div class="row" style="padding-left: 360px; ">
     <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = []" />
     <q-btn color="secondary" flat label="Get Min Withdraw Fee on selected chain" @click="OKXminfee()"/>
@@ -455,7 +455,7 @@ export default {
       <q-separator dark inset />
   <div class="row">
     <div class="col-sm">
-    <q-scroll-area style="height: 300px; max-width: 550px;">
+    <q-scroll-area style="height: 600px; max-width: 550px;">
      <q-card-section class="q-pt-none" v-for="item in resulttext" :key="item">
         <q-separator dark inset />
         {{ item }}
@@ -464,7 +464,7 @@ export default {
     </q-scroll-area>
     </div>
     <div class="col-sm">
-    <q-scroll-area style="height: 300px; max-width: 550px;">
+    <q-scroll-area style="height: 600px; max-width: 550px;">
       <q-card-section class="q-pt-none" v-for="item in resulttextget" :key="item">
         <q-separator dark inset />
         {{ item }}

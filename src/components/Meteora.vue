@@ -19,23 +19,33 @@ const wallet12 = useLocalStorage('wallet12', '');
 const wallet13 = useLocalStorage('wallet13', '');
 const wallet14 = useLocalStorage('wallet14', '');
 const wallet15 = useLocalStorage('wallet15', '');
+const wallet16 = useLocalStorage('wallet16', '');
+const wallet17 = useLocalStorage('wallet17', '');
+const wallet18 = useLocalStorage('wallet18', '');
+const wallet19 = useLocalStorage('wallet19', '');
+const wallet20 = useLocalStorage('wallet20', '');
+const wallet21 = useLocalStorage('wallet21', '');
+const wallet22 = useLocalStorage('wallet22', '');
+const wallet23 = useLocalStorage('wallet23', '');
+const wallet24 = useLocalStorage('wallet24', '');
 const resulttext = ref([]);
 let result = ref();
 const apiUrl = ref('https://point-api.meteora.ag/points/');
-const wallets = [wallet1.value, wallet2.value, wallet3.value, wallet4.value, wallet5.value, wallet6.value, wallet7.value, wallet8.value, wallet9.value, wallet10.value, wallet11.value, wallet12.value, wallet13.value, wallet14.value, wallet15.value];
+const wallets = [wallet1.value, wallet2.value, wallet3.value, wallet4.value, wallet5.value, wallet6.value, wallet7.value, wallet8.value, wallet9.value, wallet10.value, wallet11.value, wallet12.value, wallet13.value, wallet14.value, wallet15.value, wallet16.value, wallet17.value, wallet18.value, wallet19.value, wallet20.value, wallet21.value, wallet22.value, wallet23.value, wallet24.value];
 
 async function GetMeteora() {
   try {
     for (const wallet of wallets) {
       if (wallet) {
-        const response = await axios.get(`${apiUrl.value}${wallet}`);
-        console.log(response.data);
+        const response = await axios.get(`${apiUrl.value}${wallet}`, { timeout: 10000 });
+//        console.log(response.data);
         const parsedResponse = `'Meteora points' ${new Date().toString()} - 'wallet address' ${wallet} - ${JSON.stringify(response.data)}`;
         resulttext.value = [...resulttext.value, parsedResponse];
       }
     }
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    const parsedError = `${new Date().toString()}, ${error.message}`;
+    resulttext.value = [...resulttext.value, parsedError];
   }
 };
 
@@ -57,6 +67,15 @@ export default {
       wallet13,
       wallet14,
       wallet15,
+      wallet16,
+      wallet17,
+      wallet18,
+      wallet19,
+      wallet20,
+      wallet21,
+      wallet22,
+      wallet23,
+      wallet24,
       wallets,
       resulttext,
       result,
@@ -83,28 +102,37 @@ export default {
     <q-input standout="bg-teal text-white" stack-label v-model="wallet3" label="Address3"/> 
     <q-input standout="bg-teal text-white" stack-label v-model="wallet4" label="Address4"/>
     <q-input standout="bg-teal text-white" stack-label v-model="wallet5" label="Address5"/>
-    </div>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet6" label="Address6"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet7" label="Address7"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet8" label="Address8"/>
+  </div>
 <!--    <q-btn fab icon="add" color="grey" />-->
     </div>
     <div class="col-sm" style="max-width: 400px;">
     <div class="q-gutter-md q-pa-md" style="width: 400px; font-size: 11px; padding: 15px;">
 <!--    <ul><b>Points checker by addresses</b></ul>-->
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet6" label="Address6"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet7" label="Address7"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet8" label="Address8"/> 
     <q-input standout="bg-teal text-white" stack-label v-model="wallet9" label="Address9"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet10" label="Address10"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet10" label="Address10"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet11" label="Address11"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet12" label="Address12"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet13" label="Address13"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet14" label="Address14"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet15" label="Address15"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet16" label="Address16"/>
     </div>
 <!--    <q-btn fab icon="add" color="grey" />-->
     </div>  
     <div class="col-sm" style="max-width: 400px;">
     <div class="q-gutter-md q-pa-md" style="max-width: 400px; font-size: 11px; padding: 15px;">
 <!--    <ul><b>Satlayer Points checker</b></ul>-->
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet11" label="Address11"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet12" label="Address12"/>    
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet13" label="Address13"/> 
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet14" label="Address14"/>
-    <q-input standout="bg-teal text-white" stack-label v-model="wallet15" label="Address15"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet17" label="Address17"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet18" label="Address18"/>    
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet19" label="Address19"/> 
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet20" label="Address20"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet21" label="Address21"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet22" label="Address22"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet23" label="Address23"/>
+    <q-input standout="bg-teal text-white" stack-label v-model="wallet24" label="Address24"/>
     </div>
   </div>
 </div>
@@ -121,12 +149,9 @@ export default {
   <div style="margin-left: 45px;">
   <q-btn color="secondary" label="Get Meteora Points for adresses" @click="GetMeteora()"/>
   </div>
-  <div style="margin-left: 130px;">
+  <div style="margin-left: 540px;">
     <q-btn disable color="info" label="Get Solayer Points for adresses" @click="GetMeteora()"/>
   </div>
-  <div style="margin-left: 130px;">
-    <q-btn disable color="warning" label="Get Satlayer Points for adresses" @click="GetMeteora()"/>
-  </div> 
 </div>
 </q-card>
 </div>
