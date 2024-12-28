@@ -32,7 +32,7 @@
         </q-item>
         <q-separator spaced />
         <q-item clickable
-         disable
+        disable
          :active="link === 'Bitget'"
          @click="link = 'Bitget'"
          active-class="menu-link"

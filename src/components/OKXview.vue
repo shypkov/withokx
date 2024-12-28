@@ -314,13 +314,15 @@ export default {
         {label: 'USDT', value: 'USDT'},
         {label: 'USDC', value: 'USDC'},
         {label: 'BTC', value: 'BTC'},
+        {label: 'WBTC', value: 'WBTC'},
         {label: 'BNB', value: 'BNB'},
         {label: 'APT', value: 'APT'},
         {label: 'Polygon', value: 'POL'},
-        {label: 'AVAX', value: 'AVAX'},
+        {label: 'SUI', value: 'SUI'},
         {label: 'TON', value: 'TON'},
         {label: 'SOL', value: 'SOL'},
-        {label: 'ZETA', value: 'ZETA'}
+        {label: 'AVAX', value: 'AVAX'},
+        {label: 'ATOM', value: 'ATOM'}
         ]"/>
     </div>
     </div>
@@ -376,6 +378,16 @@ export default {
       :options="[
         {label: 'BTC', value: 'BTC-Bitcoin'}
         ]"/>
+    <q-btn-toggle v-if="ccy === 'WBTC'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="blue"
+      :options="[
+        {label: 'ERC20', value: 'ETH-ERC20'},
+        {label: 'XLayer', value: 'ETH-X Layer'}
+        ]"/>        
     <q-btn-toggle v-if="ccy === 'BNB'"
       size="md"
       v-model="networks"
@@ -403,15 +415,6 @@ export default {
       :options="[
         {label: 'POL', value: 'POL-Polygon'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'AVAX'"
-      size="md"
-      v-model="networks"
-      push
-      glossy
-      toggle-color="yellow"
-      :options="[
-        {label: 'AVAX C-Chain', value: 'AVAX-Avalanche C-Chain'}
-        ]"/>
     <q-btn-toggle v-if="ccy === 'TON'"
       size="md"
       v-model="networks"
@@ -430,15 +433,33 @@ export default {
       :options="[
         {label: 'SOLANA', value: 'SOL-Solana'}
         ]"/>
-    <q-btn-toggle v-if="ccy === 'ZETA'"
+    <q-btn-toggle v-if="ccy === 'SUI'"
       size="md"
       v-model="networks"
       push
       glossy
       toggle-color="blue"
       :options="[
-        {label: 'ZETA', value: 'ZETA-ZetaChain'}
+        {label: 'SUI', value: 'Sui'}
         ]"/>     
+    <q-btn-toggle v-if="ccy === 'ATOM'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="blue"
+      :options="[
+        {label: 'Cosmos', value: 'Cosmos'}
+        ]"/>             
+    <q-btn-toggle v-if="ccy === 'AVAX'"
+      size="md"
+      v-model="networks"
+      push
+      glossy
+      toggle-color="yellow"
+      :options="[
+        {label: 'AVAX C-Chain', value: 'AVAX-Avalanche C-Chain'}
+        ]"/>        
     </div> 
   </div>
  </div>
