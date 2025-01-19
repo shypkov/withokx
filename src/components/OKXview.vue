@@ -340,7 +340,8 @@ export default {
         {label: 'Arbi', value: 'ETH-Arbitrum One'},
         {label: 'Base', value: 'ETH-Base'},
         {label: 'Linea', value: 'ETH-Linea'},
-        {label: 'XLayer', value: 'ETH-X Layer'}
+        {label: 'Optimism', value: 'ETH-Optimism'},
+        {label: 'Starknet', value: 'ETH-Starknet'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDT'"
       size="md"
@@ -353,7 +354,8 @@ export default {
         {label: 'TRC20', value: 'USDT-TRC20'},
         {label: 'SOL', value: 'USDT-Solana'},
         {label: 'Polygon', value: 'USDT-Polygon'},
-        {label: 'XLayer', value: 'USDT-X Layer'},
+        {label: 'TON', value: 'USDT-TON'},
+        {label: 'Optimism', value: 'USDT-Optimism'},
         {label: 'Arbi', value: 'USDT-Arbitrum One'}        
         ]"/>
     <q-btn-toggle v-if="ccy === 'USDC'"
@@ -366,7 +368,8 @@ export default {
         {label: 'ERC20', value: 'USDC-ERC20'},
         {label: 'Solana', value: 'USDC-Solana'},
         {label: 'Polygon', value: 'USDC-Polygon'},
-        {label: 'XLayer', value: 'USDC-X Layer'},
+        {label: 'Base', value: 'USDC-Base'},
+        {label: 'Optimism', value: 'USDC-Optimism'},
         {label: 'Arbi', value: 'USDC-Arbitrum One'}
         ]"/>
     <q-btn-toggle v-if="ccy === 'BTC'"
