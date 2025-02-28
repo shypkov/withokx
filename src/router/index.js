@@ -4,6 +4,7 @@ import Bitget from '../components/Bitget.vue';
 import Meteora from '../components/Meteora.vue';
 import Ambient from '../components/Ambient.vue';
 import Karak from '../components/Karak.vue';
+import FAQ from '../components/FAQ.vue';
 
 const routes = [
   { path: '/', redirect: '/OKXview' },
@@ -11,7 +12,8 @@ const routes = [
   { path: '/Bitget', name: 'Bitget', component: Bitget },
   { path: '/Meteora', name: 'Meteora', component: Meteora },
   { path: '/Ambient', name: 'Ambient', component: Ambient },
-  { path: '/Karak', name: 'Karak', component: Karak }
+  { path: '/Karak', name: 'Karak', component: Karak },
+  { path: '/FAQ', name: 'FAQ', component: FAQ },
 ];
 
 const router = createRouter({
