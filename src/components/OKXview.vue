@@ -164,13 +164,12 @@ export default {
 <template>
 <div class="container">
   <div class="row" style="margin-left: 15px;">
-   <!-- Первая карточка (Адреса) Начало-->
+   <!-- 1st card begin-->
     <div class="col-md-4">
     <q-card class="sticky-card">
     <div class="col-sm q-gutter-md q-pa-md" style="max-width: auto; margin-left: -25px; font-size: 10px;">
     <ul><b>Fill the address carefully and successively. This form is not validating inputs</b></ul>
     <q-input v-for="(address, index) in addresses" :key="index" standout="bg-teal text-white" stack-label v-model="addresses[index]" :label="'Address ' + (index + 1)"/>
-    <!-- Дополнительные адреса -->
     <q-input v-for="(address, index) in extaddresses" :key="'extra-' + index" standout="bg-orange text-white" stack-label v-model="extaddresses[index]" :label="'Extra Address ' + (index + 1)"/>
     <q-btn fab icon="add" color="grey" @click="addExtraAddress()">
     <q-tooltip>Additional addresses are not stored</q-tooltip>
@@ -178,12 +177,11 @@ export default {
     </div>
     </q-card>
    </div>
-  <!-- Первая карточка (Адреса) Конец -->
+  <!-- 1st card end -->
 
-<!-- Вторая и третья карточки в одной строке -->
+<!-- second third cards begin -->
 <div class="col-md-8" style="padding: 0px;  margin-left: -60px;">
   <div class="row" style="width: auto;">
-    <!-- Вторая карточка (Диапазон вывода) -->
     <div class="col-md-6">
       <q-card class="content card-size">
         <div class="q-gutter-md q-pa-md card-content">
@@ -201,7 +199,6 @@ export default {
       </q-card>
     </div>
 
-    <!-- Третья карточка (API конфиг) -->
     <div class="col-md-6">
       <q-card class="content card-size">
         <div class="q-gutter-md q-pa-md card-content">
@@ -213,9 +210,9 @@ export default {
       </q-card>
     </div>
   </div>
-
+<!-- second third cards end -->
 <div style="height: 30px"><q-space /></div>
-<!-- Четвёртая карточка (Выбор сети) - начало -->
+<!-- fourth card begin -->
 <div class="row" style="padding: 0px; height:auto; margin-left: 20px;">
  <div class="col-11.5">
   <q-card class="content" style="height: 140px">
@@ -286,16 +283,12 @@ export default {
      </q-card>
     </div>
     </div>
-    <!-- Четвёртая карточка (Выбор сети) конец -->
+    <!-- fourth card end -->
     <div style="height: 20px"><q-space /></div>
-    <!-- Пятая карточка с кнопками и консолью Начало -->
+    <!-- fivth card begin -->
     <div class="row btn-row">
     <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = [],resulttextget = []" />
     <q-btn color="red" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
-      <!--<div v-if="progress">
-        <q-spinner-box color="primary" size="3em" /> 
-        <q-tooltip :offset="[0, 8]">Running</q-tooltip>
-      </div>-->
     <q-btn color="secondary" flat label="Get Min Withdraw Fee" @click="OKXminfee()"/>
      </div>
     
@@ -325,25 +318,22 @@ export default {
   </div>
   </q-card>
 </div>
-<!-- Пятая карточка конец-->
+<!-- fivth card end-->
   </div>
  </div>
 </div>
 </template>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+<!-- Some styles need to check them and sync with main styles -->
 <style scoped>
-/* Общий стиль для карточек */
 .card-size {
-  width: 400px;  /* Фиксированная ширина */
+  width: 400px;  
   height: 280px;
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 
-/* Внутреннее центрирование контента */
 .card-content {
   width: 100%;
   text-align: center;
@@ -352,7 +342,6 @@ export default {
   align-items: center;
 }
 
-/* Группировка инпутов с отступом 10px */
 .input-group {
   display: flex;
   gap: 10px;
@@ -367,7 +356,7 @@ export default {
   overflow-x: auto;
 }
 
-/* Sticky card слева */
+/* Sticky card */
 .sticky-card {
   position: sticky;
   left: 0;
@@ -382,7 +371,6 @@ export default {
 }
 
 .content {
-/*  max-height:350px;*/
   width: auto;
   margin-left: 20px;
 }
