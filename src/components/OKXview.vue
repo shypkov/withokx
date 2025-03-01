@@ -10,11 +10,7 @@ const apiKey = useLocalStorage('apikey', '');
 const passphrase = useLocalStorage('pass', '');
 const secretKey = useLocalStorage('secret', '');
 const addresses = useLocalStorage('addresses', Array(13).fill(''));
-//const adress1 = useLocalStorage('address1', '');
-//const adress2 = useLocalStorage('address2', '');
-//const adress3 = useLocalStorage('address3', '');
-//const adress4 = useLocalStorage('address4', '');
-//const adress5 = useLocalStorage('address5', '');
+const extaddresses = ref([]); 
 const minWithdrawal = ref();
 const maxWithdrawal = ref();
 const mintimedelay = ref();
@@ -27,6 +23,8 @@ let result = ref();
 const progress = ref(false);
 const usedelay = ref(false);
 const baseUrl = ref('https://www.okx.com');
+
+function addExtraAddress() {if (extaddresses.value.length < 7) {extaddresses.value.push('')}};
 
 async function OKXminfee() {
    try {
@@ -47,12 +45,22 @@ const response = await axios.get(baseUrl.value + getUrl, {
     }
 });
 const FullResponse = response.data;
-const parsedResponse = `${new Date().toString()} withdraw fee = ${FullResponse.data[0].minFee}, min withdraw value = ${FullResponse.data[0].minWd} for chain ${FullResponse.data[0].chain}, ccy ${FullResponse.data[0].ccy}`;
-resulttextget.value = [...resulttextget.value, parsedResponse];
-console.log(response.data);
-}catch (error)
-{console.error(`Error: ${error.message}`);};
-};
+const selectedNetworkData = FullResponse.data.find(
+        (item) => item.chain === networks.value
+      );
+      if (selectedNetworkData) {
+      const parsedResponse = `${new Date().toString()} withdraw fee = ${selectedNetworkData.minFee}, min withdraw value = ${selectedNetworkData.minWd} for chain ${selectedNetworkData.chain}, ccy ${selectedNetworkData.ccy}`;
+      resulttextget.value = [...resulttextget.value, parsedResponse];
+      console.log(`Selected Network: ${selectedNetworkData.chain}`);
+      console.log(`Min Fee: ${selectedNetworkData.minFee}`);
+      console.log(`Min Withdraw: ${selectedNetworkData.minWd}`);
+      } else {
+        console.warn(`No data found for ${networks.value}`);
+      }
+   } catch (error) {
+      console.error(`Error: ${error.message}`);
+   }
+}
 
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
@@ -114,8 +122,7 @@ console.log("")
 async function withdrawToAddresses() {
 progress.value=true;
 try {
-//    const wallets = [adress1.value,adress2.value,adress3.value,adress4.value,adress5.value].filter(w => w && w.length > 0);
-      const wallets = addresses.value.filter(w => w && w.length > 0);
+      const wallets = [...addresses.value, ...extaddresses.value].filter(w => w && w.length > 0);
     for (const destinationWallet of wallets) {
       await sendTokens({ destinationWallet });
     }
@@ -130,12 +137,8 @@ progress.value=false;
 export default {
   setup () {
   return {
-     addresses,
-//      adress1,
-//      adress2,
-//      adress3,
-//      adress4,
-//      adress5,
+      addresses,
+      extaddresses,
       apiKey,
       secretKey,
       passphrase,
@@ -150,6 +153,7 @@ export default {
       resulttextget,
       result,
       progress,
+      addExtraAddress,
       OKXminfee,
       withdrawToAddresses
     } 
@@ -163,10 +167,14 @@ export default {
    <!-- Первая карточка (Адреса) Начало-->
     <div class="col-md-4">
     <q-card class="sticky-card">
-    <div class="col-sm q-gutter-md q-pa-md" style="max-width: 450px; margin-left: -25px; font-size: 10px;">
+    <div class="col-sm q-gutter-md q-pa-md" style="max-width: auto; margin-left: -25px; font-size: 10px;">
     <ul><b>Fill the address carefully and successively. This form is not validating inputs</b></ul>
     <q-input v-for="(address, index) in addresses" :key="index" standout="bg-teal text-white" stack-label v-model="addresses[index]" :label="'Address ' + (index + 1)"/>
-    <q-btn fab icon="add" color="grey" />
+    <!-- Дополнительные адреса -->
+    <q-input v-for="(address, index) in extaddresses" :key="'extra-' + index" standout="bg-orange text-white" stack-label v-model="extaddresses[index]" :label="'Extra Address ' + (index + 1)"/>
+    <q-btn fab icon="add" color="grey" @click="addExtraAddress()">
+    <q-tooltip>Additional addresses are not stored</q-tooltip>
+    </q-btn>
     </div>
     </q-card>
    </div>
@@ -282,8 +290,8 @@ export default {
     <div style="height: 20px"><q-space /></div>
     <!-- Пятая карточка с кнопками и консолью Начало -->
     <div class="row btn-row">
-    <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = []" />
-    <q-btn color="primary" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
+    <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = [],resulttextget = []" />
+    <q-btn color="red" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
       <!--<div v-if="progress">
         <q-spinner-box color="primary" size="3em" /> 
         <q-tooltip :offset="[0, 8]">Running</q-tooltip>
@@ -370,6 +378,7 @@ export default {
   z-index: 100;
   padding: 10px;
   box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+  min-height: auto;
 }
 
 .content {
