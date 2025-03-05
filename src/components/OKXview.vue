@@ -22,6 +22,8 @@ const resulttextget = ref([]);
 let result = ref();
 const progress = ref(false);
 const usedelay = ref(false);
+const submanage = ref(false);
+const subAcct = ref('');
 const baseUrl = ref('https://www.okx.com');
 
 function addExtraAddress() {if (extaddresses.value.length < 7) {extaddresses.value.push('')}};
@@ -61,6 +63,106 @@ const selectedNetworkData = FullResponse.data.find(
       console.error(`Error: ${error.message}`);
    }
 }
+
+async function getbalances() {
+  try {
+const timestamp = new Date().toISOString().split('.')[0] + "Z";
+const method = 'GET';
+const body = '';
+const subAcctName = subAcct.value.trim();
+
+if (!subAcctName) {
+      console.warn("Sub-account name is empty!");
+      resulttext.value = [...resulttext.value, "no sub-account name"];
+      return;
+    }
+
+const endpoints = {
+      trading: `/api/v5/account/subaccount/balances?subAcct=${subAcctName}`,
+      funding: `/api/v5/asset/subaccount/balances?subAcct=${subAcctName}`
+    };
+
+    const headers = (url) => ({
+      'Content-Type': 'application/json',
+      'OK-ACCESS-SIGN': CryptoJS.enc.Base64.stringify(
+        CryptoJS.HmacSHA256(timestamp + method + url + body, secretKey.value)
+      ),
+      'OK-ACCESS-KEY': apiKey.value,
+      'OK-ACCESS-TIMESTAMP': timestamp,
+      'OK-ACCESS-PASSPHRASE': passphrase.value
+    });
+
+    const tradingResponse = await axios.get(baseUrl.value + endpoints.trading, {
+      headers: headers(endpoints.trading)
+    });
+
+    const fundingResponse = await axios.get(baseUrl.value + endpoints.funding, {
+      headers: headers(endpoints.funding)
+    });
+
+    console.log('Trading Balance:', tradingResponse.data);
+    console.log('Funding Balance:', fundingResponse.data);
+
+    let parsedResponse = `\n🔹 SubAccount: ${subAcctName}\n`;
+    
+    const safeValue = (value, fallback) => (value !== undefined ? value : fallback);
+
+    let tradingBalanceText = "\n Trading Balance:\n";
+    let fundingBalanceText = "\n Funding Balance:\n";
+
+    if (tradingResponse.data.code !== '0') {
+      tradingBalanceText += `${tradingResponse.data.msg}\n`;
+    } else if (tradingResponse.data.data.length) {
+      tradingResponse.data.data.forEach(balance => {
+        tradingBalanceText += `${safeValue(balance.availBal, "0")} ${safeValue(balance.ccy, "null")};\n`;
+      });
+    } else {
+      tradingBalanceText += "0\n"; 
+    }
+
+    if (fundingResponse.data.code !== '0') {
+      fundingBalanceText += `${fundingResponse.data.msg}\n`;
+    } else if (fundingResponse.data.data.length) {
+      fundingResponse.data.data.forEach(balance => {
+        fundingBalanceText += `${safeValue(balance.availBal, "0")} ${safeValue(balance.ccy, "null")};\n`;
+      });
+    } else {
+      fundingBalanceText += "0\n"; 
+    }
+
+    parsedResponse += tradingBalanceText + fundingBalanceText;
+    resulttext.value = [...resulttext.value, parsedResponse];
+
+  } catch (error) {
+    console.error(`Error fetching balances: ${error.message}`);
+    console.error("Full error response:", error.response?.data);
+    resulttext.value = [...resulttext.value, `Failed to get balances: ${error.message}`];
+  }
+}
+
+/*const getSig = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + getUrl + body, secretKey.value));
+const response = await axios.get(baseUrl.value + getUrl, {
+    method: method,
+    url: getUrl,
+    headers: {
+        'Content-Type': 'application/json',
+        'OK-ACCESS-SIGN': getSig,
+        'OK-ACCESS-KEY': apiKey.value,
+        'OK-ACCESS-TIMESTAMP': timestamp,
+        'OK-ACCESS-PASSPHRASE': passphrase.value
+    }
+});
+const FullResponse = response.data;
+console.log('Response', FullResponse)
+//      const parsedResponse = `${new Date().toString()} withdraw fee = ${selectedNetworkData.minFee}, min withdraw value = ${selectedNetworkData.minWd} for chain ${selectedNetworkData.chain}, ccy ${selectedNetworkData.ccy}`;
+//      resulttextget.value = [...resulttextget.value, parsedResponse];
+//      console.log(`Selected Network: ${selectedNetworkData.chain}`);
+//      console.log(`Min Fee: ${selectedNetworkData.minFee}`);
+//      console.log(`Min Withdraw: ${selectedNetworkData.minWd}`);
+  } catch (error) {console.error(`Error: ${error.message}`)}
+}*/
+
+
 
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
@@ -153,6 +255,9 @@ export default {
       resulttextget,
       result,
       progress,
+      submanage,
+      subAcct,
+      getbalances,
       addExtraAddress,
       OKXminfee,
       withdrawToAddresses
@@ -212,13 +317,29 @@ export default {
   </div>
 <!-- second third cards end -->
 <div style="height: 30px"><q-space /></div>
-<!-- fourth card begin -->
-<div class="row" style="padding: 0px; height:auto; margin-left: 20px;">
- <div class="col-11.5">
-  <q-card class="content" style="height: 140px">
-    <div class="q-gutter-md q-pa-md" style="padding: 10px;">
+<!-- q-toggle -->
+<div class="row align-items-start">
+  <!-- Left col in row: q-toggle -->
+  <div class="col-sm-1">
+    <q-card class="smallcard" style="display: flex; flex-direction: column; margin-left: 20px; align-items: center;">
+      <q-toggle color="red" v-model="submanage"/>
+      <div class="text-caption">Manage Accounts</div>
+    </q-card>
+  </div>
+<!-- Right col in row: card 4.1 -->
+    <div class="col-md-10.5" style="padding: 8px">
+    <q-card v-if="submanage" class="content" style="height: 140px;">
+      <div class="q-gutter-sm q-pa-sm" style="padding: 10px;">
+        <b>Insert SubAccount name</b>
+        <q-input label="subAcct name" v-model="subAcct" outlined />
+      </div>
+    </q-card>
+    <!-- #4.1 end -->
+<!-- 4 card begin -->
+  <q-card v-else class="col-md-10.5 content" style="height: 140px">
+    <div class="q-gutter-sm q-pa-sm" style="padding: 10px;">
       <b>Select Chain & Asset to withdraw</b>
-    <q-btn-toggle size="md" v-model="ccy" push glossy toggle-color="green"
+    <q-btn-toggle size="sm" v-model="ccy" push glossy toggle-color="green"
       :options="[
         {label: 'ETH', value: 'ETH'},
         {label: 'USDT', value: 'USDT'},
@@ -231,7 +352,7 @@ export default {
         {label: 'SUI', value: 'SUI'},
         {label: 'TON', value: 'TON'},
         {label: 'SOL', value: 'SOL'},
-        {label: 'AVAX', value: 'AVAX'},
+        {label: 'BERA', value: 'BERA'},
         {label: 'ATOM', value: 'ATOM'}]"/>
     </div>
   
@@ -277,8 +398,8 @@ export default {
       :options="[{label: 'SUI', value: 'Sui'}]"/>     
     <q-btn-toggle v-if="ccy === 'ATOM'" size="md" v-model="networks" push glossy toggle-color="blue"
       :options="[{label: 'Cosmos', value: 'ATOM-Cosmos'}]"/>             
-    <q-btn-toggle v-if="ccy === 'AVAX'" size="md" v-model="networks" push glossy toggle-color="yellow"
-      :options="[{label: 'AVAX C-Chain', value: 'AVAX-Avalanche C-Chain'}]"/>        
+    <q-btn-toggle v-if="ccy === 'BERA'" size="md" v-model="networks" push glossy toggle-color="yellow"
+      :options="[{label: 'BERA', value: 'BERA-Berachain'}]"/>        
      </div> 
      </q-card>
     </div>
@@ -288,8 +409,10 @@ export default {
     <!-- fivth card begin -->
     <div class="row btn-row">
     <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = [],resulttextget = []" />
-    <q-btn color="red" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
-    <q-btn color="secondary" flat label="Get Min Withdraw Fee" @click="OKXminfee()"/>
+    <q-btn v-if="!submanage" color="red" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
+    <q-btn v-if="submanage" color="red" label="Transfer" disable :loading="progress" :disabled="progress" @click="withdrawToAddresses()" /> 
+    <q-btn v-if="!submanage" color="secondary" flat label="Get Min Withdraw Fee" @click="OKXminfee()"/>
+    <q-btn v-if="submanage" color="secondary" flat label="Get SubAcct Balances" @click="getbalances()"/>
      </div>
     
 <div style="padding-left: 20px;">
@@ -340,6 +463,14 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.smallcard {
+  height: 140px;
+  width: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .input-group {

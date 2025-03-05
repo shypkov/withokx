@@ -11,11 +11,17 @@ module.exports = defineConfig({
   },
   devServer: {
     proxy: {
-      '/api': {
-        target: 'https://api.bitget.com', // Change to your API base URL
+      '/api/bitget': {  // Оставляем Bitget
+        target: 'https://api.bitget.com',
         changeOrigin: true,
-        pathRewrite: { '^/api': '' }, // Remove /api prefix when sending requests
+        pathRewrite: { '^/api/bitget': '' },
       },
-    },
-  },
+      '/api/okx': {  // Добавляем OKX
+        target: 'https://www.okx.com',
+        changeOrigin: true,
+        pathRewrite: { '^/api/okx': '' },
+        secure: false, // Игнорируем SSL (если есть проблемы)
+      }
+    }
+  }
 });
