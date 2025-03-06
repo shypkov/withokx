@@ -17,6 +17,7 @@
           <p>- Action: Fill the fields above with values, optionally you can enable random time delay between transfers on addresses and just click Withdraw button... watch result in console log</p>
           <p>- WARNING: Please DO NOT RELOAD or CLOSE THIS Page when WITHDRAW is Running. If you do - the process will be terminated</p>
           <p>- WARNING: Notice that Form inputs are not validated. Be sure you enter a proper adress and values before withdraw</p>
+          <p>- WARNING: Transer Section works only with FROM subaccount to Main, just remember your subacnt name</p>
           <p>- Debug: If you see CORS error in console then install browser extension to avoid CORS blocking <a href='https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf'>CORS EXT</a> and enable it.</p>
           <p>- Debug: if you see Network error message with "net::ERR_NAME_NOT_RESOLVED" then this means you couldnot reach the okx.com check your connection</p>
           <p>- ADVICE: if you still have issues with the app or need a neccessary function, contact the dev: <a href='https://t.me/cryptopitek'>cryptopitek</a></p>

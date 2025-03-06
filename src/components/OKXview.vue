@@ -24,6 +24,8 @@ const progress = ref(false);
 const usedelay = ref(false);
 const submanage = ref(false);
 const subAcct = ref('');
+const transferamount = ref('');
+const direction = ref('6');
 const baseUrl = ref('https://www.okx.com');
 
 function addExtraAddress() {if (extaddresses.value.length < 7) {extaddresses.value.push('')}};
@@ -140,29 +142,64 @@ const endpoints = {
   }
 }
 
-/*const getSig = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA256(timestamp + method + getUrl + body, secretKey.value));
-const response = await axios.get(baseUrl.value + getUrl, {
-    method: method,
-    url: getUrl,
-    headers: {
-        'Content-Type': 'application/json',
-        'OK-ACCESS-SIGN': getSig,
-        'OK-ACCESS-KEY': apiKey.value,
-        'OK-ACCESS-TIMESTAMP': timestamp,
-        'OK-ACCESS-PASSPHRASE': passphrase.value
+async function transferFunds() {
+  try {
+    const timestamp = new Date().toISOString().split('.')[0] + "Z";
+    const method = 'POST';
+    const url = '/api/v5/asset/transfer';
+
+    const subAcctName = subAcct.value.trim();
+    const currency = ccy.value.trim();
+    const amount = transferamount.value.trim();
+
+    if (!subAcctName || !currency || !amount) {
+      console.warn("Missing parameters!");
+      resulttext.value = [...resulttext.value, "Missing parameters!"];
+      return;
     }
-});
-const FullResponse = response.data;
-console.log('Response', FullResponse)
-//      const parsedResponse = `${new Date().toString()} withdraw fee = ${selectedNetworkData.minFee}, min withdraw value = ${selectedNetworkData.minWd} for chain ${selectedNetworkData.chain}, ccy ${selectedNetworkData.ccy}`;
-//      resulttextget.value = [...resulttextget.value, parsedResponse];
-//      console.log(`Selected Network: ${selectedNetworkData.chain}`);
-//      console.log(`Min Fee: ${selectedNetworkData.minFee}`);
-//      console.log(`Min Withdraw: ${selectedNetworkData.minWd}`);
-  } catch (error) {console.error(`Error: ${error.message}`)}
-}*/
 
+    const body = JSON.stringify({
+      type: "2",
+      subAcct: subAcctName,
+      ccy: currency,
+      amt: amount,
+      from: "6",
+      to: direction.value
+    });
 
+    const headers = {
+      'Content-Type': 'application/json',
+      'OK-ACCESS-SIGN': CryptoJS.enc.Base64.stringify(
+        CryptoJS.HmacSHA256(timestamp + method + url + body, secretKey.value)
+      ),
+      'OK-ACCESS-KEY': apiKey.value,
+      'OK-ACCESS-TIMESTAMP': timestamp,
+      'OK-ACCESS-PASSPHRASE': passphrase.value
+    };
+
+    const response = await axios.post(baseUrl.value + url, body, { headers });
+
+    console.log("🔹 Transfer Response:", response.data);
+
+    if (response.data?.code === "0") {
+      resulttext.value = [...resulttext.value, `Transfer successful: ${amount} ${currency} from ${subAcctName}`];
+    } else if (response.data?.code) {
+      resulttext.value = [...resulttext.value, `Transfer failed: ${response.data.msg} (Code: ${response.data.code})`];
+    } else {
+      resulttext.value = [...resulttext.value, `Unexpected response: ${JSON.stringify(response.data)}`];
+    }
+
+  } catch (error) {
+    console.error("Full error response:", error.response?.data);
+
+    if (error.response?.data) {
+      const errorMsg = `Transfer error: ${error.response.data.msg} (Code: ${error.response.data.code})`;
+      resulttext.value = [...resulttext.value, errorMsg];
+    } else {
+      resulttext.value = [...resulttext.value, `Transfer error: ${error.message}`];
+    }
+  }
+}
 
 const generateOKXSign = (timestamp, method, body) => {
   const withdrawalEndpoint = '/api/v5/asset/withdrawal';
@@ -257,6 +294,9 @@ export default {
       progress,
       submanage,
       subAcct,
+      transferamount,
+      direction,
+      transferFunds,
       getbalances,
       addExtraAddress,
       OKXminfee,
@@ -318,7 +358,7 @@ export default {
 <!-- second third cards end -->
 <div style="height: 30px"><q-space /></div>
 <!-- q-toggle -->
-<div class="row align-items-start">
+<div class="row align-items-start" style="width: auto">
   <!-- Left col in row: q-toggle -->
   <div class="col-sm-1">
     <q-card class="smallcard" style="display: flex; flex-direction: column; margin-left: 20px; align-items: center;">
@@ -327,16 +367,32 @@ export default {
     </q-card>
   </div>
 <!-- Right col in row: card 4.1 -->
-    <div class="col-md-10.5" style="padding: 8px">
-    <q-card v-if="submanage" class="content" style="height: 140px;">
-      <div class="q-gutter-sm q-pa-sm" style="padding: 10px;">
-        <b>Insert SubAccount name</b>
-        <q-input label="subAcct name" v-model="subAcct" outlined />
-      </div>
-    </q-card>
-    <!-- #4.1 end -->
+    <div class="col-md-10.5 content">
+      <q-card v-if="submanage" style="height: 140px;">
+        <div class="align-items-left" style="width: auto"><b>Configure Transfer Parameters to Main account</b></div>
+        <div class="row q-gutter-sm" style="align-items: center; padding: 10px;">
+        <q-input class="col-md-2" label="SubAcct name" v-model="subAcct" outlined />
+        <q-input class="col-md-2" label="Amount" v-model="transferamount" outlined />
+        <div class="row q-gutter-sm justify-end">
+          <q-btn-toggle class="col-sm-auto" size="md" style="margin-bottom: 5px;" toggle-color="blue" v-model="ccy" push glossy
+           :options="[
+           {label: 'ETH', value: 'ETH'},
+           {label: 'USDT', value: 'USDT'},
+           {label: 'USDC', value: 'USDC'},
+           {label: 'BTC', value: 'BTC'},
+           {label: 'SOL', value: 'SOL'},
+           {label: 'BERA', value: 'BERA'},
+          {label: 'ATOM', value: 'ATOM'}]"/>
+       </div>
+        </div>
+        <q-btn-toggle style="margin-left: 20px" class="col-sm-auto" toggle-color="green" v-model="direction" push glossy
+        :options="[
+        {label: 'Receive to Funding', value: '6'},
+        {label: 'Receive to Trading', value: '18'}]"/>
+       </q-card>
+    <!-- #4.1 end   justify-end -->
 <!-- 4 card begin -->
-  <q-card v-else class="col-md-10.5 content" style="height: 140px">
+  <q-card v-else class="col-md-10.5 content" style="height: 140px; padding: 10px;">
     <div class="q-gutter-sm q-pa-sm" style="padding: 10px;">
       <b>Select Chain & Asset to withdraw</b>
     <q-btn-toggle size="sm" v-model="ccy" push glossy toggle-color="green"
@@ -410,7 +466,7 @@ export default {
     <div class="row btn-row">
     <q-btn color="secondary" flat label="Press to empty console screen" @click="resulttext = [],resulttextget = []" />
     <q-btn v-if="!submanage" color="red" label="Withdraw" v-model="progress" :loading="progress" :disabled="progress"  @click="withdrawToAddresses()" /> 
-    <q-btn v-if="submanage" color="red" label="Transfer" disable :loading="progress" :disabled="progress" @click="withdrawToAddresses()" /> 
+    <q-btn v-if="submanage" color="red" label="Transfer" :loading="progress" :disabled="progress" @click="transferFunds()" /> 
     <q-btn v-if="!submanage" color="secondary" flat label="Get Min Withdraw Fee" @click="OKXminfee()"/>
     <q-btn v-if="submanage" color="secondary" flat label="Get SubAcct Balances" @click="getbalances()"/>
      </div>
